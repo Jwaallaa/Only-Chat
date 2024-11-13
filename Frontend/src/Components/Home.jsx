@@ -5,6 +5,15 @@ import Login from './Login'
 import Register from './Register'
 import { useState ,useEffect } from 'react'
 const Home = () => {
+    const checkUserInfo = () => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (userInfo) {
+          return true; // User info exists
+        } else {
+          return false; // User info does not exist
+        }
+      };
+
 
     const [login, setlogin] = useState(false)
     const [register, setregister] = useState(false)
@@ -21,7 +30,13 @@ const Home = () => {
         setregister(true)
         
     }
-
+    useEffect(() => {
+        if(checkUserInfo()){
+            navigate("/Only-Chat/chats");
+        }
+      
+    }, [])
+    
     
     
   return (
