@@ -5,9 +5,16 @@ import userRouter from './routes/userRouter.js';
 import DBConnect from './Utils/DBConnect.js';
 import chatsRouter from './routes/chatsRouter.js'
 
+
+
 const app = express();
 
-app.use(cors())
+app.use(cors({
+    origin: 'https://jwaallaa.github.io',
+    methods: ['GET', 'POST'],
+  })); 
+
+
 DBConnect();
 
 app.use(express.json());
