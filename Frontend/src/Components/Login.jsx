@@ -53,22 +53,20 @@ const Login = ({ setregister, setlogin }) => {
   };
 
   return (
-    <>
-      <div className="login-box">
-        <h2>Welcome Back</h2>
-        <Form onSubmit={handleLogin}>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Username or email"
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-            required
-          />
-          <br />
-
+    <div className="login-box">
+      <h2>Welcome Back</h2>
+      <Form onSubmit={handleLogin}>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Username or email"
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+          required
+        />
+        <div className="password-container">
           <input
             type={show ? "text" : "password"}
             id="password"
@@ -77,25 +75,22 @@ const Login = ({ setregister, setlogin }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button id="showbtn" type="button" onClick={togglePasswordVisibility}>
-            {show ? "Hide" : "Show"}
-          </button>
-          <br />
-
-          <button type="submit" disabled={loading}>
-            {loading ? (
-              <div className="spinner-mini"></div> // Spinner when loading
-            ) : (
-              "Login"
-            )}
-          </button>
-        </Form>
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
-        <h3>
-          New to OnlyChat? <button onClick={register}>Get Started</button>
-        </h3>
-      </div>
-    </>
+          <i
+            className={`fa ${show ? "fa-eye-slash" : "fa-eye"}`}
+            id="showbtn"
+            type="button"
+            onClick={togglePasswordVisibility}
+          ></i>
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? <div className="spinner-mini"></div> : "Login"}
+        </button>
+      </Form>
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
+      <h3>
+        New to OnlyChat? <button onClick={register}>Get Started</button>
+      </h3>
+    </div>
   );
 };
 

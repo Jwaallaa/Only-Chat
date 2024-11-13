@@ -1,19 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import './Navbar.css';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Modal from './Modal';
+import React, { useState, useEffect } from "react";
+import "./Navbar.css";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Modal from "./Modal";
 
-const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox }) => {
+const Navbar = ({
+  setUsersearch,
+  setSearch,
+  setLoading,
+  searchbox,
+  setsearchbox,
+}) => {
   const [isSearching, setIsSearching] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
   const navigate = useNavigate();
-  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   // Debounced search effect
   useEffect(() => {
-    if (searchbox.trim() === '') return;
+    if (searchbox.trim() === "") return;
     const timeoutId = setTimeout(() => searchHandler(), 500);
     return () => clearTimeout(timeoutId);
   }, [searchbox]);
@@ -23,17 +29,20 @@ const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox 
     if (!searchbox) return;
     setIsSearching(true);
     try {
-      const responce = await axios.get(`https://only-chat.onrender.com/api/user/${searchbox}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const responce = await axios.get(
+        `https://only-chat.onrender.com/api/user/${searchbox}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setLoading(true);
       console.log(responce.data);
       setUsersearch(responce.data);
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
     } finally {
       setIsSearching(false);
       setLoading(false);
@@ -46,10 +55,10 @@ const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox 
   };
 
   const logout = () => {
-    localStorage.removeItem('userInfo');
-    localStorage.removeItem('chats');
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("chats");
 
-    navigate('/Only-Chat');
+    navigate("/Only-Chat");
   };
 
   const closeModal = () => setShowModal(false);
@@ -67,15 +76,23 @@ const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox 
             aria-label="Search User"
           />
           <button className="searchbtn" type="submit" disabled={isSearching}>
-            {isSearching ? <div className="spinner-mini"></div> : 'Search'}
+            {isSearching ? <div className="spinner-mini"></div> : "Search"}
           </button>
         </form>
       </div>
 
       {userInfo && (
         <div className="profile">
-          <h3 onClick={handleProfileClick}>{userInfo?.username}</h3>
-          <button onClick={logout}>Logout</button>
+          {window.innerHeight >= window.innerWidth ? (
+            <i className="fa-solid fa-user" onClick={handleProfileClick}></i>
+          ) : (
+            <h3 onClick={handleProfileClick}>{userInfo?.username}</h3>
+          )}
+          {window.innerHeight >= window.innerWidth ? (
+            <i onClick={logout} className="fa-solid fa-right-from-bracket"></i>
+          ) : (
+            <button onClick={logout}>Logout</button>
+          )}
         </div>
       )}
 

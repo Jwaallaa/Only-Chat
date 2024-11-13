@@ -15,13 +15,13 @@ const Chats = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const [search, setSearch] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [chatLoading, setChatLoading] = useState(false); // New loading state for chat history
+  const [chatLoading, setChatLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [showSingleChat, setShowSingleChat] = useState(false);
 
   // Fetch chats
   const fetchChats = async () => {
-    if (!userInfo || !userInfo.token) {
-      return;
-    }
+    if (!userInfo || !userInfo.token) return;
 
     const cachedChats = localStorage.getItem("chats");
     if (cachedChats) {
@@ -35,14 +35,10 @@ const Chats = () => {
     try {
       const response = await fetch("https://only-chat.onrender.com/api/chats", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      if (!response.ok) throw new Error("Network response was not ok");
 
       const data = await response.json();
       setChats(data);
@@ -54,35 +50,39 @@ const Chats = () => {
     }
   };
 
-  // Fetch chat history for a specific user
-  const SelectedUserChat = async (userId) => {
-    setChatLoading(true); // Start loading the chat history spinner
+  // Fetch chat history for a selected user
+  const SelectedUserChat = async (username) => {
+    setChatLoading(true);
     const token = userInfo.token;
 
     try {
       const response = await fetch(
-        `https://only-chat.onrender.com/api/chats/${userId}`,
+        `https://only-chat.onrender.com/api/chats/${username}`,
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      if (!response.ok) throw new Error("Network response was not ok");
 
       const data = await response.json();
       setChathistory(data);
-      setFriendName(userId);
-      setChatLoading(false); // Stop loading once the data is fetched
+      setFriendName(username);
+      setChatLoading(false);
+      if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
-      setChatLoading(false); // Stop loading even on error
+      setChatLoading(false);
     }
   };
+
+  // Handle resizing to update mobile view detection
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     fetchChats();
@@ -127,7 +127,10 @@ const Chats = () => {
               <div key={suser._id}>
                 <UserCard
                   username={suser.name}
-                  onClick={() => SelectedUserChat(suser.username)}
+                  onClick={() =>{
+                    SelectedUserChat(suser.username);
+                    setSearch(false);
+                  } }
                 />
               </div>
             ))
@@ -138,52 +141,55 @@ const Chats = () => {
       </div>
 
       <div className="chatpage">
-        <div className="chatscontainer">
-          <h2>Chats</h2>
-          {loading ? (
-            <div className="spinner"></div>
-          ) : chats.length > 0 ? (
-            [
-              ...new Map(
-                chats.map((chat) => [
-                  chat.sender && chat.sender._id === userInfo._id
-                    ? chat.receiver._id
-                    : chat.sender._id,
-                  chat,
-                ])
-              ).values(),
-            ].map((chat) => {
-              const isSenderLoggedInUser =
-                chat.sender && chat.sender._id === userInfo._id;
-              const displayUsername = isSenderLoggedInUser
-                ? chat.receiver.username
-                : chat.sender
-                ? chat.sender.username
-                : "Unknown User";
+        {/* Conditional rendering based on screen size */}
+        {!isMobile || !showSingleChat ? (
+          <div className="chatscontainer">
+            <h2>Chats</h2>
+            {loading ? (
+              <div className="spinner"></div>
+            ) : chats.length > 0 ? (
+              [
+                ...new Map(
+                  chats.map((chat) => [
+                    chat.sender && chat.sender._id === userInfo._id
+                      ? chat.receiver._id
+                      : chat.sender._id,
+                    chat,
+                  ])
+                ).values(),
+              ].map((chat) => {
+                const isSenderLoggedInUser =
+                  chat.sender && chat.sender._id === userInfo._id;
+                const displayUsername = isSenderLoggedInUser
+                  ? chat.receiver.username
+                  : chat.sender
+                  ? chat.sender.username
+                  : "Unknown User";
 
-              return (
-                <div
-                  key={chat._id}
-                  onClick={() => SelectedUserChat(displayUsername)}
-                >
-                  <UserCard username={displayUsername} />
-                </div>
-              );
-            })
-          ) : (
-            <h3>No chats available</h3>
-          )}
-        </div>
-
-        {chatLoading ? (
-          <div className="spinner-container">
-            <div className="spinner"></div> {/* Spinner centered in the div */}
+                return (
+                  <div
+                    key={chat._id}
+                    onClick={() => SelectedUserChat(displayUsername)}
+                  >
+                    <UserCard username={displayUsername} />
+                  </div>
+                );
+              })
+            ) : (
+              <h3>No chats available</h3>
+            )}
           </div>
-        ) : (
+        ) : null}
+
+        {/* Only show SingleChat on mobile if a chat is selected */}
+        {(!isMobile || showSingleChat) && (
           <SingleChat
             friendName={friendName}
             Chathistory={Chathistory}
-            setFriendName={setFriendName}
+            setFriendName={(name) => {
+              setFriendName(name);
+              setShowSingleChat(false); // Return to chat list on mobile when closing chat
+            }}
             setChathistory={setChathistory}
           />
         )}

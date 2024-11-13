@@ -1,79 +1,116 @@
-.main{
+/* General styles */
+.main {
     width: 100vw;
     height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* justify-content: space-evenly; */
-    
+    justify-content: center; /* Centering the main container */
+    background-color: #f3f4f8; /* Light background for modern feel */
+}
 
-h1{
-    width: 300px;
+h1 {
+    width: 100%;
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     margin-top: 5px;
     font-weight: bold;
-    color: black;
-    padding: 10px 40px;
-    background-color: #CB9DF0;
-    border-radius: 25px;
-    border: 2px solid gray;
-}
+    color: #4a4a4a;
+    padding: 15px 0;
+    background-color: #d9b8f2;
+    border-bottom: 2px solid #aaa;
 }
 
-.innermain{
+/* Inner content */
+.innermain {
     display: flex;
-    height: 100%;
-    width: 100%;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-.imgCont{
+    height: 100%;
     width: 90%;
-    height: 70%;
+}
+
+.imgCont {
+    width: 100%;
+    height: auto;
+    min-height: 60%; /* Ensure it takes up the screen height */
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center; /* Centering the content horizontally and vertically */
     background-image: url(../../Utills/bg_inner.jpg);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    
+    padding: 20px ;
+    position: relative;
 }
-.textCont{
-    width: 45%;
-    height: 70%;
+
+/* Text content container */
+.textCont {
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    gap : 35px;
-    border-radius: 25px;
-    margin-right: 10px;
-    background-color: #fddbbb87;
-}
-.Register{
-    padding: 15px 95px;
-    text-decoration: none;
-    background-color: #F0C1E1;
-    border: 1px solid grey;
-    border-radius: 10px;
-    transition: all 0.5s ease;
-    color: #70084f;
-}
-.Register:hover{
-    box-shadow: 0px 0px 15px #00000072;
-}
-.Login{
-    transition: all 0.5s ease;
-    text-decoration: none;
-    padding: 5px 15px;
-    background-color: #FFF9BF;
-    border-radius: 7px;
-    border: 1px solid grey;
-    color: #635a07;
+    gap: 25px;
+    border-radius: 15px;
+    background-color: #ffe6f5; /* Light pink for gentle contrast */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    position: absolute; /* Make it absolute so it stays centered in .imgCont */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the element */
 }
 
-.Login:hover{
-    box-shadow: 0px 0px 15px #00000072;
+/* Button styles */
+.Register, .Login {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.Register {
+    background-color: #f0c1e1;
+    color: #70084f;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.Register:hover {
+    background-color: #e3afce;
+}
+
+.Login {
+    background-color: #fff9bf;
+    color: #635a07;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.Login:hover {
+    background-color: #f2e29d;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8rem;
+        padding: 10px;
+    }
+
+    .textCont {
+        width: 90%;
+        padding: 15px;
+        max-width: 350px; /* Ensures it doesn’t get too wide on smaller screens */
+    }
+
+    .Register, .Login {
+        width: 100%;
+        font-size: 1rem;
+    }
 }

@@ -1,46 +1,100 @@
-.register-box{
-    width: 45%;
-    height: 70%;
+.register-box {
+    width: 100%;
+    max-width: 450px; /* Ensure the form doesn't stretch too wide */
+    height: auto;
     display: flex;
-    justify-content: space-between;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    background-color: #fddbbb87;
-    margin-right: 10px;
-    border-radius: 25px;
-    h2{
-        font-size: 2.5rem;
-        
-
-    }
-    input{
-        margin: 5px 0;
-        width: 294px;
-        height: 30px;
-        background-color: #ffffffad;
-        border: 1px solid grey;
-        border-radius: 3px;
-        outline: none;
-        padding: 0 3px;
-        
-    }
-    form>button{
-        width: 300px;
-        height: 30px;
-        border: 1px solid grey;
-        border-radius: 8px;
-        background-color: #fddbbb87;
-        
-
-    }
-    h3>button{
-        width: 100px;
-        height: 30px;
-        border: 1px solid grey;
-        border-radius: 8px;
-        background-color: rgb(106, 62, 21);
-        color: white;
-    }
-
-
+    background-color: #ffe6f5; /* Subtle background color */
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 20px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Adding some shadow for depth */
+    transition: all 0.3s ease-in-out;
 }
+
+.register-box:hover {
+    transform: scale(1.02); /* Slightly enlarge on hover for a modern feel */
+}
+
+h2 {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #4a4a4a;
+    margin-bottom: 20px;
+}
+
+input {
+    margin: 12px 0;
+    width: 100%;
+    max-width: 350px; /* Restrict input size */
+    height: 40px;
+    padding: 0 12px;
+    background-color: #ffffff;
+    border: 1px solid #d1d1d1;
+    border-radius: 10px;
+    outline: none;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    border-color: #a94dff; /* Focus color change */
+    box-shadow: 0 0 5px rgba(169, 77, 255, 0.5); /* Glow effect on focus */
+}
+
+form > button {
+    width: 100%;
+    max-width: 350px;
+    height: 45px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ff5f61;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+form > button:hover {
+    background-color: #ff3a3e; /* Button hover effect */
+    transform: scale(1.05);
+}
+
+h3 > button {
+    width: 100px;
+    height: 35px;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    background-color: #6a3e15;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+h3 > button:hover {
+    background-color: #4f2b10;
+    transform: scale(1.05); /* Slight grow effect */
+}
+.password-container {
+    position: relative;
+    left: -11.5px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  #showbtn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: rgba(250, 235, 215, 0);
+    cursor: pointer;
+    position: absolute;
+    right: -30px; /* Position to the right of the password input field */
+    top: 59%;
+    transform: translateY(-50%);
+  }

@@ -1,118 +1,192 @@
-.chatpage{
-    width: 100vw;
-    /* height: 100vh; */
-    display: flex;
-    justify-content: space-between;
-    /* align-items: center; */
-
+.chatpage {
+  width: 100vw;
+  /* height: 100vh; */
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
 }
 
-
-.searchedusers{
+.searchedusers {
     position: absolute;
-    left: -360px;
+    left: -500px; /* Start off-screen, adjusted to the width of the div */
     background-color: white;
     width: 350px;
-    height: 88vh;
+    height: 86vh; /* Full height for better mobile responsiveness */
     padding: 13px 5px;
     border-top-right-radius: 50px;
     border-bottom-right-radius: 50px;
-    transition: all 1s , ease ;
-    overflow: hidden;
-    overflow-y: scroll;
-}
-.searchedusers::-webkit-scrollbar {
-    display: none; /* Hide scrollbar */
-}
-
-.innerbox{
-    
-    padding: 8px 2px;
-    display: flex;
+    transition: left 0.5s ease; /* Smooth transition effect */
     overflow-y: auto;
-    flex-wrap: nowrap;
-    justify-content: center;
-    flex-direction: column;
-    >div{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        >i{
-            margin-right: 3px;
-            font-size: 25px;
-            height: 20px;
-            width: 20px;
-        }
-    }
+    z-index: 10; /* Ensure it stays on top */
+  }
+.searchedusers::-webkit-scrollbar {
+  display: none; /* Hide scrollbar */
 }
 
-.show{
-    left: 0px;
+.innerbox {
+  padding: 8px 2px;
+  display: flex;
+  overflow-y: auto;
+  flex-wrap: nowrap;
+  justify-content: center;
+  flex-direction: column;
+  > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      >h1{
+        background-color: transparent;
+        margin-bottom: 25px;
+      }
+    > i {
+      /* margin-right: 3px; */
+      font-size: 25px;
+      height: 15px;
+      width: 15px;
+      text-align: center;
+    }
+  }
 }
 
-.noLogin{
-    display: flex;
-    height: 100vh;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    button{
-        width: 120px;
-        height: 30px;
-        border: 1px solid grey;
-        border-radius: 8px;
-        background-color: rgb(106, 62, 21);
-        color: white;
-    }
+.show {
+  left: 0px;
 }
 
-.chatscontainer{
-    min-width:318px;
-    background-color: #8d8d8d88;
-    border-top-right-radius : 12px;
-    border-bottom-right-radius : 12px;
-    padding: 8px 12px;
+.noLogin {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  button {
+    width: 120px;
+    height: 30px;
+    border: 1px solid grey;
+    border-radius: 8px;
+    background-color: rgb(106, 62, 21);
+    color: white;
+  }
+}
 
-    >h2{
-        background-color: bisque;
-        padding: 6px 10px;
-        border-radius : 12px;
-        margin-bottom: 10px;
-    }
+.chatscontainer {
+  min-width: 318px;
+  background-color: #8d8d8d88;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  padding: 8px 12px;
 
+  > h2 {
+    background-color: bisque;
+    padding: 6px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
 }
 .spinner {
-    justify-self: center;
-    border: 3px solid #f3f3f3; 
-    border-top: 3px solid #bebebe; 
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    animation: spin 2s linear infinite;
-  }
-  
-  .spinner-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 60%; /* Same as .singlechat width */
-    height: 600px; /* Same as .singlechat height */
-    margin-right: 30px;
-    background-color: white; /* Same as .singlechat background color */
-    border-radius: 12px; /* Same border-radius as .singlechat */
-  }
-  
-  .spinner-mini{
-    justify-self: center;
-    border: 3px solid #f3f3f3; 
-    border-top: 3px solid #bebebe; 
-    border-radius: 50%;
-    width: 15px;
-    height: 15px;
-    animation: spin 2s linear infinite;
+  justify-self: center;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #bebebe;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  animation: spin 2s linear infinite;
+}
 
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60%; /* Same as .singlechat width */
+  height: 600px; /* Same as .singlechat height */
+  margin-right: 30px;
+  background-color: white; /* Same as .singlechat background color */
+  border-radius: 12px; /* Same border-radius as .singlechat */
+}
+
+.spinner-mini {
+  justify-self: center;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #bebebe;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
   }
+}
+
+.chatpage.show-single-chat .chatscontainer {
+  display: none;
+}
+
+/* Adjusting the chat container for mobile */
+@media (max-width: 768px) {
+  .chatpage {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  /* Adjusting the chat list and single chat container */
+  .chatscontainer,
+  .singlechat {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+
+  /* Hide unnecessary content */
+  .searchedusers {
+    width: 90%;
+    margin: auto;
+  }
+
+  /* Smaller button and icon sizes */
+  .head h2 {
+    font-size: 1rem;
+  }
+
+  .head i {
+    font-size: 1.2rem;
+  }
+
+  /* Message input adjustments */
+  .chatinput input {
+    font-size: 1rem;
+    padding: 8px;
+    width: 80%;
+  }
+
+  .chatinput button {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+}
+
+/* Default layout for desktop */
+.chatpage {
+    display: flex;
+  }
+  
+  .chatscontainer {
+    width: 30%;
+    border-right: 1px solid #ddd;
+  }
+  
+  
+  
+  /* Mobile layout */
+  @media (max-width: 768px) {
+    .chatpage {
+      display: block;
+    }
+    .chatscontainer{
+      width: 100%;
+    }
+  }
+  
