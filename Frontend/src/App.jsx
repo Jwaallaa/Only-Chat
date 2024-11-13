@@ -1,32 +1,27 @@
-import { createBrowserRouter , RouterProvider } from 'react-router-dom'
-import './App.css'
-import Home from './Components/Home'
-import Login from './Components/Login'
-import Chats from './Components/Chats'
+import { createHashRouter, RouterProvider } from 'react-router-dom'; // Use createHashRouter for hash-based routing
+import './App.css';
+import Home from './Components/Home';
+import Chats from './Components/Chats';
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/Only-Chat",
-    element : <Home/>
-  }
-  ,
+    element: <Home />
+  },
   {
-    path : "/Only-Chat/chats",
-    element: <Chats/>
+    path: "/Only-Chat/chats",
+    element: <Chats />
   }
-
-] ,{
+], {
   future: { v7_startTransition: true }, // Enable the future flag
-})
+});
 
 function App() {
-  
-
   return (
     <>
-      <RouterProvider router = {router}/>
+      <RouterProvider router={router} />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
