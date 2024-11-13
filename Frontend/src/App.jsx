@@ -1,16 +1,15 @@
 import { createHashRouter, RouterProvider } from 'react-router-dom'; // Use createHashRouter for hash-based routing
 import './App.css';
 import Home from './Components/Home';
-import Login from './Components/Login';
 import Chats from './Components/Chats';
 
 const router = createHashRouter([
   {
-    path: "/", // Updated path
-    element: <Home /> 
+    path: "/Only-Chat",
+    element: <Home />
   },
   {
-    path: "/chats", // Updated path
+    path: "/Only-Chat/chats",
     element: <Chats />
   }
 ], {
