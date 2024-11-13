@@ -5,10 +5,11 @@ import Register from './Register'
 import { useState ,useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
+
 
 
 const Home = () => {
+    const navigate = useNavigate();
     const checkUserInfo = () => {
         const userInfo = JSON.parse(localStorage.getItem("userInfo"));
         if (userInfo) {
