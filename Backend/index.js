@@ -4,43 +4,38 @@ import cors from 'cors';
 import userRouter from './routes/userRouter.js';
 import DBConnect from './Utils/DBConnect.js';
 import chatsRouter from './routes/chatsRouter.js';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 
 const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST']
-    }
-});
 
-// Middleware configuration
-app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: true }));
-app.options('*', cors());
+// Configure CORS to allow requests from your frontend
+app.use(cors({
+    origin: '*', // Your GitHub Pages frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Ensure OPTIONS is included
+    allowedHeaders: ['Content-Type', 'Authorization'], // Include allowed headers
+    credentials: true
+}));
+
+// Handle preflight requests
+app.options('*', cors()); // This allows the server to respond to preflight requests
+
+// Connect to the database
 DBConnect();
+
+// Middleware to parse incoming JSON requests
 app.use(express.json());
+
+// Define API routes
 app.use('/api/user', userRouter);
 app.use('/api/chats', chatsRouter);
 
-app.get('/', (req, res) => res.send('Hello World'));
-
-// Socket.IO connection event
-io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
-
-    // Listen for a chat message
-    socket.on('sendMessage', (messageData) => {
-        socket.broadcast.emit('receiveMessage', messageData);
-    });
-
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-    });
+// Default route for testing server status
+app.get('/', (req, res) => {
+    res.send('Hello World');
 });
 
-// Start server on specified port
-httpServer.listen(process.env.PORT, () => {
+// Start server and listen on the specified port
+app.listen(process.env.PORT, () => {
     console.log(`Server is running on port http:${process.env.PORT}`);
 });
+
+export default app;
