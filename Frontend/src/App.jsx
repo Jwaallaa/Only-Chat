@@ -5,11 +5,11 @@ import Chats from './Components/Chats';
 
 const router = createHashRouter([
   {
-    path: "/Only-Chat",
+    path: "/",
     element: <Home />
   },
   {
-    path: "/Only-Chat/chats",
+    path: "/chats",
     element: <Chats />
   }
 ], {
