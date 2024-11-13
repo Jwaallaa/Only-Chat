@@ -28,7 +28,7 @@ const Login = ({ setregister, setlogin }) => {
         );
         console.log(data);
         localStorage.setItem("userInfo", JSON.stringify(data));
-        navigate('/Chats');
+        navigate('/Only-Chat/Chats');
       } catch (error) {
         console.error("Login error:", error);
         setErrorMessage("Login failed. Please check your credentials.");

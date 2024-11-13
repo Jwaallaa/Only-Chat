@@ -7,22 +7,18 @@ import Chats from './Components/Chats'
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/Only-Chat",
     element : <Home/>
   }
   ,
   {
-    path: "/login",
+    path: "/Only-Chat/login",
     element : <Login/>
   }
   ,
   {
-    path : "/Chats",
+    path : "/Only-Chat/Chats",
     element: <Chats/>
-  }
-  ,{
-    path : "/Chats/:name",
-    element : <SingleChat/>
   }
 
 ] ,{

@@ -43,7 +43,7 @@ const Register = ({ setregister, setlogin }) => {
             console.log(data);
             localStorage.setItem("userInfo", JSON.stringify(data));
             setlogin(true)
-            navigate('/');
+            navigate('/Only-Chat');
         }
         catch(error){
           setError(error.message);

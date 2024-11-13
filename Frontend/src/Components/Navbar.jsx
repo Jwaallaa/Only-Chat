@@ -51,7 +51,7 @@ const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox 
     localStorage.removeItem('userInfo');
     localStorage.removeItem('chats');
 
-    navigate('/');
+    navigate('/Only-Chat');
   };
 
   const closeModal = () => setShowModal(false);

@@ -92,7 +92,7 @@ const Chats = () => {
   }, []);
 
   const handleLoginRedirect = () => {
-    navigate("/");
+    navigate("/Only-Chat");
   };
 
   return !userInfo || !userInfo.token ? (
