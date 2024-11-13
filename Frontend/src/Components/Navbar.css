@@ -1,48 +1,83 @@
-nav{
+nav {
     display: flex;
     justify-content: space-between;
     height: 40px;
     align-items: center;
     margin: 5px;
-    input{
-        margin: 10px 0;
-        width: 294px;
-        height: 40px;
-        background-color: #ffffffad;
-        border: 1px solid grey;
-        border-radius: 3px;
-        outline: none;
-        padding: 0 3px;
-    }
-    .searchbtn{
-        cursor: pointer;
-        transform: translate(-110px);
-        width: 100px;
-        height: 30px;
-        border: 1px solid grey;
-        border-radius: 8px;
-        background-color: rgb(106, 62, 21);
-        color: white;
-    }
-}
-.profile{
+  }
+  
+  nav .search-container {
+    position: relative; /* Position container relative to place the button inside */
+    width: 20%; /* Adjust the width of the search container */
+  }
+  
+  nav input {
+    width: calc(100% - 10px); /* Make the input field take up the space except for the button width */
+    height: 40px;
+    background-color: #ffffffad;
+    border: 1px solid grey;
+    border-radius: 3px;
+    outline: none;
+    padding: 0 10px 0 3px; /* Add some padding for the text */
+  }
+  
+  .searchbtn {
+    position: absolute;
+    right: 0; /* Align button to the right side of the input */
+    top: 50%;
+    transform: translateY(-50%); /* Center the button vertically */
+    width: 100px; /* Keep the button width as before */
+    height: 30px;
+    border: 1px solid grey;
+    border-radius: 8px;
+    background-color: rgb(106, 62, 21);
+    color: white;
     display: flex;
-    width: 10%;
-    gap: 15px;
+    align-items: center;
+    justify-content: center; /* Center the spinner or text inside the button */
+    cursor: pointer;
+    padding: 0; /* Remove any extra padding inside the button */
+  }
+  
+  .profile {
+    display: flex;
+    gap: 10px;
     flex-direction: row;
     align-items: center;
     cursor: pointer;
     margin-right: 10px;
-    div{
-        width: 20px;
+  }
+  
+  .profile div {
+    width: 20px;
+  }
+  
+  .profile button {
+    width: 100px;
+    height: 30px;
+    border: 1px solid grey;
+    border-radius: 8px;
+    background-color: rgb(106, 62, 21);
+    cursor: pointer;
+    color: white;
+  }
+  
+  .spinner-mini {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #bebebe;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    animation: spin 2s linear infinite;
+  }
+  
+  /* Spinner animation */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
     }
-    button{
-        width: 100px;
-        height: 30px;
-        border: 1px solid grey;
-        border-radius: 8px;
-        background-color: rgb(106, 62, 21);
-        cursor: pointer;
-        color: white;
+    100% {
+      transform: rotate(360deg);
     }
-}
+  }
+  

@@ -151,7 +151,7 @@ const SingleChat = ({
               placeholder="Type a message"
             />
             <button type="submit" disabled={!message || loading}>
-              {loading ? <div className="spinner"></div> : "Send"}
+              {loading ? <div className="spinner-mini"></div> : "Send"}
             </button>
           </form>
         </>

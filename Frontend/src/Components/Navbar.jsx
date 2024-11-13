@@ -23,16 +23,14 @@ const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox 
     if (!searchbox) return;
     setIsSearching(true);
     try {
-      const responce = await axios.get(`https://only-chat.onrender.com/api/user/${searchbox}` ,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const responce = await axios.get(`https://only-chat.onrender.com/api/user/${searchbox}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setLoading(true);
-      console.log(responce.data)
+      console.log(responce.data);
       setUsersearch(responce.data);
     } catch (error) {
       console.error('Search error:', error);
@@ -58,7 +56,7 @@ const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox 
 
   return (
     <nav>
-      <div>
+      <div className="search-container">
         <form onSubmit={(e) => e.preventDefault()}>
           <input
             type="text"
@@ -69,7 +67,7 @@ const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox 
             aria-label="Search User"
           />
           <button className="searchbtn" type="submit" disabled={isSearching}>
-            {isSearching ? <span className="spinner"></span> : 'Search'}
+            {isSearching ? <div className="spinner-mini"></div> : 'Search'}
           </button>
         </form>
       </div>

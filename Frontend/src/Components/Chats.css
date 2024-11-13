@@ -91,8 +91,28 @@
     animation: spin 2s linear infinite;
   }
   
+  .spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60%; /* Same as .singlechat width */
+    height: 600px; /* Same as .singlechat height */
+    margin-right: 30px;
+    background-color: white; /* Same as .singlechat background color */
+    border-radius: 12px; /* Same border-radius as .singlechat */
+  }
+  
+  .spinner-mini{
+    justify-self: center;
+    border: 3px solid #f3f3f3; 
+    border-top: 3px solid #bebebe; 
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    animation: spin 2s linear infinite;
+
+  }
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  
