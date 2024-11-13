@@ -10,9 +10,10 @@ import chatsRouter from './routes/chatsRouter.js'
 const app = express();
 
 app.use(cors({
-    origin: 'https://jwaallaa.github.io',
+    origin: 'https://jwaallaa.github.io', // Add your frontend URL
     methods: ['GET', 'POST'],
-  })); 
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
 
 
 DBConnect();
