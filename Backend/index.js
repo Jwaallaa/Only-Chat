@@ -9,10 +9,10 @@ const app = express();
 
 // Configure CORS to allow requests from your frontend
 app.use(cors({
-    origin: 'https://jwaallaa.github.io', // Your GitHub Pages frontend URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Add other HTTP methods as needed
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
-    credentials: true // If you're using cookies or authorization headers
+    origin: '*', // Your GitHub Pages frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Ensure OPTIONS is included
+    allowedHeaders: ['Content-Type', 'Authorization'], // Include allowed headers
+    credentials: true
 }));
 
 // Handle preflight requests
