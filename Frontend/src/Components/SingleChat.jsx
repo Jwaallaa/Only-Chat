@@ -19,7 +19,7 @@ const SingleChat = ({
     if (!message.trim()) return;
 
     setLoading(true);
-    const url = "http://localhost:3000/api/chats/message";
+    const url = "https://only-chat.onrender.com/api/chats/message";
     const token = userInfo.token;
 
     const messageData = {
@@ -59,7 +59,7 @@ const SingleChat = ({
 
   const fetchFriendDetails = async () => {
     const token = userInfo.token;
-    const url = `http://localhost:3000/api/user/find/${friendName}`;
+    const url = `https://only-chat.onrender.com/api/user/find/${friendName}`;
 
     try {
       const response = await fetch(url, {

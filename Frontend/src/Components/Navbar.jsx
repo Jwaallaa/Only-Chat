@@ -23,7 +23,7 @@ const Navbar = ({ setUsersearch, setSearch, setLoading, searchbox, setsearchbox 
     if (!searchbox) return;
     setIsSearching(true);
     try {
-      const responce = await axios.get(`http://localhost:3000/api/user/${searchbox}` ,
+      const responce = await axios.get(`https://only-chat.onrender.com/api/user/${searchbox}` ,
         {
           method: "GET",
           headers: {

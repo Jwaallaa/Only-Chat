@@ -22,7 +22,7 @@ const Login = ({ setregister, setlogin }) => {
 
       try {
         const { data } = await axios.post(
-          'http://localhost:3000/api/user/login',
+          'https://only-chat.onrender.com/api/user/login',
           { email, password },
           config
         );

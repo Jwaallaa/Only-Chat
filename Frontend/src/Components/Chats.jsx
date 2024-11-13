@@ -32,7 +32,7 @@ const Chats = () => {
   const token = userInfo.token;
 
   try {
-    const response = await fetch("http://localhost:3000/api/chats", {
+    const response = await fetch("https://only-chat.onrender.com/api/chats", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -62,7 +62,7 @@ const Chats = () => {
     const token = userInfo.token;
     try {
       const response = await fetch(
-        `http://localhost:3000/api/chats/${userId}`,
+        `https://only-chat.onrender.com/api/chats/${userId}`,
         {
           method: "GET",
           headers: {

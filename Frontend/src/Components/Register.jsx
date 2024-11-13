@@ -33,7 +33,7 @@ const Register = ({ setregister, setlogin }) => {
         };
 
         try{
-          const { data } = await axios.post('http://localhost:3000/api/user/register', {
+          const { data } = await axios.post('https://only-chat.onrender.com/api/user/register', {
             name : name,
             username: username,
             email: email,
