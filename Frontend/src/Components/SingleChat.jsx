@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./SingleChat.css";
 import Modal from "./Modal"; // Import the Modal component
+import { io } from "socket.io-client";
+
+const socket = io("https://only-chat.onrender.com"); // Connect to your Socket.IO server
 
 const SingleChat = ({
   Chathistory,
@@ -14,49 +17,31 @@ const SingleChat = ({
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const chatEndRef = useRef(null);
 
-  const sendMessage = async (event) => {
+  // Send message to server using Socket.IO
+  const sendMessage = (event) => {
     event.preventDefault();
     if (!message.trim()) return;
 
     setLoading(true);
-    const url = "https://only-chat.onrender.com/api/chats/message";
-    const token = userInfo.token;
 
     const messageData = {
       receiver: friendName,
       text: message,
     };
 
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(messageData),
-      });
+    // Emit message to Socket.IO server
+    socket.emit("sendMessage", messageData);
 
-      const data = await response.json();
-      const newMessage = {
-        ...data,
-        sender: { _id: userInfo._id },
-      };
-
-      if (response.ok) {
-        setChathistory((prevChathistory) => [...prevChathistory, newMessage]);
-        setMessage("");
-        setLoading(false);
-      } else {
-        console.error("Error sending message:", data);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Network error:", error);
-      setLoading(false);
-    }
+    // Add message to chat history (locally)
+    setChathistory((prevChathistory) => [
+      ...prevChathistory,
+      { ...messageData, sender: { _id: userInfo._id } },
+    ]);
+    setMessage(""); // Clear message input
+    setLoading(false);
   };
 
+  // Fetch friend details when the user clicks on the "eye" icon
   const fetchFriendDetails = async () => {
     const token = userInfo.token;
     const url = `https://only-chat.onrender.com/api/user/find/${friendName}`;
@@ -80,12 +65,22 @@ const SingleChat = ({
     }
   };
 
-  // Removed useEffect that automatically calls fetchFriendDetails when friendName changes
-
+  // Automatically scroll to the bottom of the chat when a new message is added
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
+  }, [Chathistory]);
+
+  // Listen for incoming messages from the server
+  useEffect(() => {
+    socket.on("receiveMessage", (messageData) => {
+      setChathistory((prevChathistory) => [...prevChathistory, messageData]);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
   }, [Chathistory]);
 
   return (
