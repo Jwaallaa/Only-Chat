@@ -1,102 +1,109 @@
 import express from "express";
 const router = express.Router();
 import User from "../models/userModel.js";
-import {passcrypt , checkpass } from '../Utils/BcryptPassword.js'
-import jwt from 'jsonwebtoken'
-import authMiddleware from '../middleware/authMiddleware.js'
-import generateToken from '../Utils/JwtToken.js'
+import { passcrypt, checkpass } from '../Utils/BcryptPassword.js';
+import jwt from 'jsonwebtoken';
+import authMiddleware from '../middleware/authMiddleware.js';
+import generateToken from '../Utils/JwtToken.js';
 
-
-router.get("/" ,(req , res)=>{
+// Get all users except the requesting user
+router.get("/", (req, res) => {
   const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Extract the token after 'Bearer'
+  const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) return res.status(401).json({ message: 'Access token is missing' });
+  if (!token) return res.status(401).json({ message: 'Access token is missing' });
 
-    jwt.verify(token, process.env.JWT_KEY, async (err, user) => {
-        if (err) return res.status(403).json({ message: 'Invalid or expired token' });
-        User.findOne()
-        req.user = user; // Attach user data to request
-        const {id} = req.user
-        const users = await User.find({ _id: { $ne:id } }) // Find all users except the requesting user
-    .then((users) => {
-      res.status(200).json(users)
-      
-    })
-  })
-})
+  jwt.verify(token, process.env.JWT_KEY, async (err, user) => {
+    if (err) return res.status(403).json({ message: 'Invalid or expired token' });
+    req.user = user;
+    const { id } = req.user;
+    try {
+      const users = await User.find({ _id: { $ne: id } });
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+});
 
+// Register a new user
 router.post("/register", (req, res) => {
-  let { name, email, password, username,pic} = req.body;
+  const { name, email, password, username, pic } = req.body;
   User.create({
     name,
     email,
-    password : passcrypt(password),
+    password: passcrypt(password),
     username,
     pic,
   })
     .then((user) => {
       res.json({
         _id: user._id,
-      name: user.name,
-      email: user.email,
-      password : user.password,
-      username: user.username,
-      pic:user.pic,
-      token: generateToken(user._id)});
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        username: user.username,
+        pic: user.pic,
+        token: generateToken(user._id),
+      });
     })
     .catch((err) => {
       res.status(400).json({ message: err.message });
     });
 });
 
+// Login user with either email or username
 router.post("/login", (req, res) => {
-  let { email, password } = req.body;
-  console.log(email + password)
-  User.findOne({ email }).then((user) => {
-    if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-    else if(!checkpass(password , user.password)){
-        return res.status(401).json({ message: "Invalid email or password" });
-    }
-    else{
-        return res.status(200).json(
-            {
-                _id: user._id,
-              name: user.name,
-              email: user.email,
-              password : user.password,
-              username: user.username,
-              pic: user.pic,
-              token: generateToken(user._id)
-            }
-        )}
-  });
+  const { email, password } = req.body;
+  console.log(email + password);
+
+  // Find user by either email or username
+  User.findOne({
+    $or: [{ email: email }, { username: email }],
+  })
+    .then((user) => {
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email/username or password" });
+      }
+      if (!checkpass(password, user.password)) {
+        return res.status(401).json({ message: "Invalid email/username or password" });
+      }
+
+      return res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        username: user.username,
+        pic: user.pic,
+        token: generateToken(user._id),
+      });
+    })
+    .catch((err) => res.status(500).json({ message: err.message }));
 });
 
+// Get users by partial username match
 router.get('/:username', async (req, res) => {
   try {
-    const name = req.params.username; // Use 'username' to match the route parameter
+    const name = req.params.username;
     const users = await User.find({
-      name: { $regex: name, $options: 'i' } // Use 'username' for the query
+      name: { $regex: name, $options: 'i' },
     });
-    res.status(200).json(users); // Send a response with a 200 status
+    res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: error.message }); // Handle errors properly
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.get('/find/:username', authMiddleware , async(req  ,res)=>{
+// Get user by exact username with authentication
+router.get('/find/:username', authMiddleware, async (req, res) => {
   const username = req.params.username;
-  try{
-  const userinfo = await User.findOne({username:username})
-  res.status(200).json(userinfo);
+  try {
+    const userinfo = await User.findOne({ username: username });
+    res.status(200).json(userinfo);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-  catch(err){
-    res.status(500).json({message:err.message})
-  }
-
-})
+});
 
 export default router;
