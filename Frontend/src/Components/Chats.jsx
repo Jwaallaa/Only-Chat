@@ -18,20 +18,14 @@ const Chats = () => {
   const [chatLoading, setChatLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showSingleChat, setShowSingleChat] = useState(false);
+  const [newMessage, setNewMessage] = useState(false);
 
   // Fetch chats
   const fetchChats = async () => {
     if (!userInfo || !userInfo.token) return;
 
-    const cachedChats = localStorage.getItem("chats");
-    if (cachedChats) {
-      setChats(JSON.parse(cachedChats));
-      setLoading(false);
-      return;
-    }
-
     const token = userInfo.token;
-
+    
     try {
       const response = await fetch("https://only-chat.onrender.com/api/chats", {
         method: "GET",
@@ -43,7 +37,6 @@ const Chats = () => {
       const data = await response.json();
       setChats(data);
       setLoading(false);
-      localStorage.setItem("chats", JSON.stringify(data));
     } catch (error) {
       console.error("Error:", error);
       setLoading(false);
@@ -70,6 +63,7 @@ const Chats = () => {
       setChathistory(data);
       setFriendName(username);
       setChatLoading(false);
+      setNewMessage(false);
       if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
@@ -86,10 +80,24 @@ const Chats = () => {
 
   useEffect(() => {
     fetchChats();
-  }, []);
+  }, [newMessage]);
 
   const handleLoginRedirect = () => {
     navigate("/Only-Chat");
+  };
+
+  // Function to get the latest message for a user
+  const getLatestMessage = (username) => {
+    const userChats = Chathistory.filter(chat => 
+      chat.sender.username === username || chat.receiver.username === username
+    );
+    
+    // If there are messages, sort by creation date and get the most recent
+    if (userChats.length > 0) {
+      userChats.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort descending by date
+      return userChats[0].text; // Return the most recent message text
+    }
+    return "No messages yet"; // Default text if no messages
   };
 
   return !userInfo || !userInfo.token ? (
@@ -127,10 +135,11 @@ const Chats = () => {
               <div key={suser._id}>
                 <UserCard
                   username={suser.name}
-                  onClick={() =>{
+                  latestMessage={getLatestMessage(suser.username)} // Pass the latest message
+                  onClick={() => {
                     SelectedUserChat(suser.username);
                     setSearch(false);
-                  } }
+                  }}
                 />
               </div>
             ))
@@ -141,23 +150,13 @@ const Chats = () => {
       </div>
 
       <div className="chatpage">
-        {/* Conditional rendering based on screen size */}
         {!isMobile || !showSingleChat ? (
           <div className="chatscontainer">
             <h2>Chats</h2>
             {loading ? (
               <div className="spinner"></div>
             ) : chats.length > 0 ? (
-              [
-                ...new Map(
-                  chats.map((chat) => [
-                    chat.sender && chat.sender._id === userInfo._id
-                      ? chat.receiver._id
-                      : chat.sender._id,
-                    chat,
-                  ])
-                ).values(),
-              ].map((chat) => {
+              chats.map((chat) => {
                 const isSenderLoggedInUser =
                   chat.sender && chat.sender._id === userInfo._id;
                 const displayUsername = isSenderLoggedInUser
@@ -167,11 +166,11 @@ const Chats = () => {
                   : "Unknown User";
 
                 return (
-                  <div
-                    key={chat._id}
-                    onClick={() => SelectedUserChat(displayUsername)}
-                  >
-                    <UserCard username={displayUsername} />
+                  <div key={chat._id} onClick={() => SelectedUserChat(displayUsername)}>
+                    <UserCard 
+                      username={displayUsername} 
+                      latestMessage={getLatestMessage(displayUsername)}  // Pass the latest message
+                    />
                   </div>
                 );
               })
@@ -181,11 +180,11 @@ const Chats = () => {
           </div>
         ) : null}
 
-        {/* Only show SingleChat on mobile if a chat is selected */}
         {(!isMobile || showSingleChat) && (
           <SingleChat
             friendName={friendName}
             Chathistory={Chathistory}
+            setNewMessage={setNewMessage}
             setFriendName={(name) => {
               setFriendName(name);
               setShowSingleChat(false); // Return to chat list on mobile when closing chat
