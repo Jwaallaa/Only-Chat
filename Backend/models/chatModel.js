@@ -2,7 +2,7 @@ import mongoose, { mongo } from "mongoose";
 
 const chatModel = new mongoose.Schema(
   {
-    chatId: { type: String, required: true }, // Unique identifier for the chat between two users
+    chatId: { type: String}, // Unique identifier for the chat between two users
 
     sender: {
       type: mongoose.Schema.Types.ObjectId,

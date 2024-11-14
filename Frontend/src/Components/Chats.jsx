@@ -27,7 +27,7 @@ const Chats = () => {
   useEffect(() => {
     const socket = io("https://only-chat.onrender.com");
 
-    socket.on ("connection", () => {
+    socket.on("connection", () => {
       console.log("Connected to the server!");
       });
     if (chatId) {
@@ -36,13 +36,13 @@ const Chats = () => {
 
     // Listen for incoming messages
     socket.on("receiveMessage", (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      setChathistory((prevMessages) => [...prevMessages, message]);
     });
 
     return () => {
       socket.off("receiveMessage"); // Clean up listener on unmount
     };
-  }, []);
+  }, [chatId]);
 
 
   const fetchChats = async () => {
