@@ -25,7 +25,7 @@ const Chats = () => {
     if (!userInfo || !userInfo.token) return;
 
     const token = userInfo.token;
-    
+
     try {
       const response = await fetch("https://only-chat.onrender.com/api/chats", {
         method: "GET",
@@ -87,11 +87,16 @@ const Chats = () => {
   };
 
   // Function to get the latest message for a user
+  // Function to get the latest message for a user
   const getLatestMessage = (username) => {
-    const userChats = Chathistory.filter(chat => 
-      chat.sender.username === username || chat.receiver.username === username
+    console.log(chats);
+
+    const userChats = chats.filter(
+      (chat) =>
+        chat.sender.username === username || chat.receiver.username === username
     );
     
+
     // If there are messages, sort by creation date and get the most recent
     if (userChats.length > 0) {
       userChats.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort descending by date
@@ -99,6 +104,38 @@ const Chats = () => {
     }
     return "No messages yet"; // Default text if no messages
   };
+
+  const getUniqueChats = () => {
+    const chatMap = new Map();
+  
+    // Iterate over each chat to store the latest chat for each unique user pair
+    chats.forEach((chat) => {
+      // Create a unique key for the user pair by sorting their IDs lexicographically
+      const userPairKey =
+        chat.sender._id < chat.receiver._id
+          ? `${chat.sender._id}-${chat.receiver._id}`
+          : `${chat.receiver._id}-${chat.sender._id}`;
+  
+      // If this pair already exists in the map, keep only the latest chat message
+      if (
+        chatMap.has(userPairKey) &&
+        new Date(chatMap.get(userPairKey).createdAt) > new Date(chat.createdAt)
+      ) {
+        return; // Skip this chat if it's older
+      }
+  
+      // Set the latest chat for this user pair in the map
+      chatMap.set(userPairKey, chat);
+    });
+  
+    // Convert the map values to an array and sort by createdAt in descending order
+    const uniqueChats = Array.from(chatMap.values()).sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+  
+    return uniqueChats;
+  };
+  
 
   return !userInfo || !userInfo.token ? (
     <div className="noLogin">
@@ -156,7 +193,7 @@ const Chats = () => {
             {loading ? (
               <div className="spinner"></div>
             ) : chats.length > 0 ? (
-              chats.map((chat) => {
+              getUniqueChats().map((chat) => {
                 const isSenderLoggedInUser =
                   chat.sender && chat.sender._id === userInfo._id;
                 const displayUsername = isSenderLoggedInUser
@@ -166,10 +203,13 @@ const Chats = () => {
                   : "Unknown User";
 
                 return (
-                  <div key={chat._id} onClick={() => SelectedUserChat(displayUsername)}>
-                    <UserCard 
-                      username={displayUsername} 
-                      latestMessage={getLatestMessage(displayUsername)}  // Pass the latest message
+                  <div
+                    key={chat._id}
+                    onClick={() => SelectedUserChat(displayUsername)}
+                  >
+                    <UserCard
+                      username={displayUsername}
+                      latestMessage={getLatestMessage(displayUsername)} // Pass the latest message
                     />
                   </div>
                 );

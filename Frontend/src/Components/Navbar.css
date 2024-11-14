@@ -5,8 +5,8 @@ nav {
   justify-content: space-between;
   height: 40px;
   align-items: center;
-  margin: 5px;
-  padding: 5px;
+  margin: 5px 0;
+  padding: 5px 0;
 }
 
 /* Search container styling */
@@ -91,6 +91,7 @@ nav input {
   .nav{
     justify-content: space-between;
     align-items: center;
+    
   }
   
   nav .search-container {
@@ -101,7 +102,7 @@ nav input {
   nav input {
     width: 100%;
     font-size: 14px;
-    padding: 5px;
+    padding: 5px 0;
   }
 
   .searchbtn {

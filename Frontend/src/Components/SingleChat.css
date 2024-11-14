@@ -79,6 +79,11 @@ i:hover {
   margin: 5px 0;
   padding: 10px;
   border-radius: 5px;
+  min-width: 90px;
+  max-width: 80%; /* Set to a percentage of the parent width */
+  word-wrap: break-word;
+  white-space: pre-wrap; /* Preserves line breaks, wraps long text */
+  overflow-wrap: break-word;
 }
 
 .message-avatar {
