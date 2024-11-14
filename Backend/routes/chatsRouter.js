@@ -6,40 +6,21 @@ import authenticateToken from '../middleware/authMiddleware.js'
 
 
 
-router.get('/:selectedUser', authenticateToken, async (req, res) => {
+router.get('/:selectedUser', authenticateToken, async(req, res) => {
     const loggedInUser = req.user.id; // Assuming you set req.user in your authenticateToken middleware
-    const selectedUserParam = req.params.selectedUser;
-    
-    let selectedUser;
-  
-    // Check if the selectedUserParam is a valid ObjectId (i.e., user ID)
-    if (mongoose.Types.ObjectId.isValid(selectedUserParam)) {
-      // If it's a valid ObjectId, search by user ID
-      selectedUser = await User.findById(selectedUserParam);
-    } else {
-      // If it's not a valid ObjectId, search by username
-      selectedUser = await User.findOne({ username: selectedUserParam });
-    }
-  
-    // If the selected user is not found, return an error response
-    if (!selectedUser) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-  
+    const Username = req.params.selectedUser;
+    const selectedUser = await User.findOne({ username: Username });
     // Fetch chats where either sender or receiver is the logged-in user and the selected user
     Chat.find({
       $or: [
-        { sender: loggedInUser, receiver: selectedUser._id },
-        { sender: selectedUser._id, receiver: loggedInUser }
+        { sender: loggedInUser, receiver: selectedUser},
+        { sender: selectedUser, receiver: loggedInUser}
       ]
-    })
-      .populate('sender', 'username')
-      .populate('receiver', 'username')
-      .sort({ createdAt: 1 }) // Sort by creation date (oldest first)
-      .then(chats => res.json(chats))
-      .catch(err => res.status(500).json({ error: err.message }));
+    }).populate('sender' , 'username').populate('receiver' , 'username')
+    .sort({ createdAt: 1 }) // Sort by creation date (oldest first)
+    .then(chats => res.json(chats))
+    .catch(err => res.status(500).json({ error: err.message }));
   });
-  
 
 router.get('/', authenticateToken ,async (req , res)=>{
     
