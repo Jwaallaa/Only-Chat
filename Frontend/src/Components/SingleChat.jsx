@@ -7,7 +7,8 @@ const SingleChat = ({
   friendName,
   setFriendName,
   setChathistory,
-  setNewMessage
+  setNewMessage,
+  setChatId
 }) => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,6 +51,7 @@ const SingleChat = ({
         setMessage("");
         setLoading(false);
         setNewMessage(true);
+        setChatId(data.chatId)
       } else {
         console.error("Error sending message:", data);
         setLoading(false);

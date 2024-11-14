@@ -4,6 +4,8 @@ import Navbar from "./Navbar";
 import UserCard from "./UserCard";
 import "./Chats.css";
 import SingleChat from "./SingleChat";
+import io from "socket.io-client";
+
 
 const Chats = () => {
   const [searchbox, setsearchbox] = useState("");
@@ -19,8 +21,30 @@ const Chats = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showSingleChat, setShowSingleChat] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-
+  const [chatId, setChatId] = useState(null);
   // Fetch chats
+
+  useEffect(() => {
+    const socket = io("https://only-chat.onrender.com");
+
+    socket.on ("connection", () => {
+      console.log("Connected to the server!");
+      });
+    if (chatId) {
+      socket.emit("joinChat", chatId);
+    }
+
+    // Listen for incoming messages
+    socket.on("receiveMessage", (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    return () => {
+      socket.off("receiveMessage"); // Clean up listener on unmount
+    };
+  }, []);
+
+
   const fetchChats = async () => {
     if (!userInfo || !userInfo.token) return;
 
@@ -230,6 +254,7 @@ const Chats = () => {
               setShowSingleChat(false); // Return to chat list on mobile when closing chat
             }}
             setChathistory={setChathistory}
+            setChatId={setChatId}
           />
         )}
       </div>
