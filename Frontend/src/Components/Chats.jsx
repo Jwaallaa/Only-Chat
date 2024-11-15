@@ -22,27 +22,40 @@ const Chats = () => {
   const [showSingleChat, setShowSingleChat] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
   const [chatId, setChatId] = useState(null);
+  const [socketmessage , setSoketmessage] = useState({});
   // Fetch chats
 
   useEffect(() => {
     const socket = io("https://only-chat.onrender.com");
-
+    
     socket.on("connection", () => {
       console.log("Connected to the server!");
-      });
+    });
     if (chatId) {
       socket.emit("joinChat", chatId);
     }
-
+    
     // Listen for incoming messages
     socket.on("receiveMessage", (message) => {
-      setChathistory((prevMessages) => [...prevMessages, message]);
+      console.log(message.text)
+      setChathistory((Chathistory) => [...Chathistory, message]);
     });
-
+    
+    
     return () => {
       socket.off("receiveMessage"); // Clean up listener on unmount
     };
-  }, [chatId]);
+    
+    
+  }, [friendName]);
+  const socket = io("https://only-chat.onrender.com");
+  
+  socket.emit("sendMessage", socketmessage);
+  useEffect(() => {
+    
+  })
+  
+  
 
 
   const fetchChats = async () => {
@@ -88,6 +101,7 @@ const Chats = () => {
       setFriendName(username);
       setChatLoading(false);
       setNewMessage(false);
+      setChatId(data[0].chatId)
       if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
@@ -113,7 +127,7 @@ const Chats = () => {
   // Function to get the latest message for a user
   // Function to get the latest message for a user
   const getLatestMessage = (username) => {
-    console.log(chats);
+    
 
     const userChats = chats.filter(
       (chat) =>
@@ -254,7 +268,9 @@ const Chats = () => {
               setShowSingleChat(false); // Return to chat list on mobile when closing chat
             }}
             setChathistory={setChathistory}
-            setChatId={setChatId}
+            // setChatId={setChatId}
+            socketmessage={socketmessage}
+            setSocketmessage={setSoketmessage}
           />
         )}
       </div>

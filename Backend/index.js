@@ -25,9 +25,10 @@ io.on("connection", (socket) => {
     console.log(`User joined chat: ${chatId}`);
   });
   // Listen for a new message
-  socket.on("sendMessage", (message) => {
-    const chatId = message.chatId;
-    io.to(chatId).emit("receiveMessage", message); // Send message to all users in the chat room
+  socket.on("sendMessage", (chat) => {
+    const recieverId = chat.recieverId;
+    const message = chat.text;
+    io.to(recieverId).emit("receiveMessage", message); // Send message to all users in the chat room
   });
 
   // Disconnect
