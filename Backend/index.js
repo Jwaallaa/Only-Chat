@@ -9,6 +9,28 @@ import http from 'http'
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  "http://localhost:5173", // Local development
+  "https://only-chat.onrender.com", // Deployed frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+// Handle preflight requests
+app.options("*", cors()); // This allows the server to respond to preflight requests
+
 const io = new Server(server, {
   cors: {
     origin: "*", // Adjust for specific client URLs in production
@@ -38,17 +60,8 @@ io.on("connection", (socket) => {
 });
 
 // Configure CORS to allow requests from your frontend
-app.use(
-  cors({
-    origin: "*", // Your GitHub Pages frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Ensure OPTIONS is included
-    allowedHeaders: ["Content-Type", "Authorization"], // Include allowed headers
-    credentials: true,
-  })
-);
 
-// Handle preflight requests
-app.options("*", cors()); // This allows the server to respond to preflight requests
+
 
 // Connect to the database
 DBConnect();
