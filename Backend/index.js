@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
   });
   // Listen for a new message
   socket.on("sendMessage", (chat) => {
-    const recieverId = chat.recieverId;
+    const recieverId = chat.reciever;
     const message = chat.text;
     io.to(recieverId).emit("receiveMessage", message); // Send message to all users in the chat room
   });
