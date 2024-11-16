@@ -38,26 +38,7 @@ const io = new Server(server, {
   },
 });
 
-io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
 
-  // Listen for join chat event
-  socket.on("joinChat", (chatId) => {
-    socket.join(chatId); // User joins a specific chat room
-    console.log(`User joined chat: ${chatId}`);
-  });
-  // Listen for a new message
-  socket.on("sendMessage", (chat) => {
-    const recieverId = chat.reciever;
-    const message = chat.text;
-    io.to(recieverId).emit("receiveMessage", message); // Send message to all users in the chat room
-  });
-
-  // Disconnect
-  socket.on("disconnect", () => {
-    console.log("A user disconnected:", socket.id);
-  });
-});
 
 // Configure CORS to allow requests from your frontend
 

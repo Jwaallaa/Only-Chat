@@ -4,7 +4,7 @@ import Navbar from "./Navbar";
 import UserCard from "./UserCard";
 import "./Chats.css";
 import SingleChat from "./SingleChat";
-import io from "socket.io-client";
+
 
 
 const Chats = () => {
@@ -25,35 +25,10 @@ const Chats = () => {
   const [socketmessage , setSoketmessage] = useState({});
   // Fetch chats
 
-  useEffect(() => {
-    const socket = io("https://only-chat.onrender.com");
-    
-    socket.on("connection", () => {
-      console.log("Connected to the server!");
-    });
-    if (chatId) {
-      socket.emit("joinChat", chatId);
-    }
-    
-    // Listen for incoming messages
-    socket.on("receiveMessage", (message) => {
-      console.log(message.text)
-      setChathistory((Chathistory) => [...Chathistory, message]);
-    });
-    
-    
-    return () => {
-      socket.off("receiveMessage"); // Clean up listener on unmount
-    };
-    
-    
-  }, [friendName]);
-  const socket = io("https://only-chat.onrender.com");
   
-  socket.emit("sendMessage", socketmessage);
-  useEffect(() => {
     
-  })
+    
+ 
   
   
 
