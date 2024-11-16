@@ -14,16 +14,19 @@ const allowedOrigins = [
   "https://only-chat.onrender.com", // Deployed frontend
 ];
 
+app.use(
+  cors({
+    origin: "*", // Allow all origins
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+    credentials: true, // Disable credentials since all origins are allowed
+  })
+);
 
 // Handle preflight requests
 app.options("*", cors()); // This allows the server to respond to preflight requests
 
-const io = new Server(server, {
-  cors: {
-    origin: "*", // Adjust for specific client URLs in production
-    methods: ["GET", "POST"],
-  },
-});
+
 
 
 
