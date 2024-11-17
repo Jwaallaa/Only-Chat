@@ -241,17 +241,20 @@ useEffect(() => {
               )}
             </div>
 
-            {showSingleChat && (
+            
               <SingleChat
                 friendName={friendName}
                 Chathistory={Chathistory}
+                setChathistory={setChathistory}
                 setNewMessage={setNewMessage}
                 setFriendName={setFriendName}
                 loading={chatLoading}
                 showSingleChat={showSingleChat}
                 setShowSingleChat={setShowSingleChat}
+                setSocketmessage={setSocketmessage}
+                setSocketsent={setSocketsent}
               />
-            )}
+            
           </>
         ) : (
           // For Mobile, only show one at a time
