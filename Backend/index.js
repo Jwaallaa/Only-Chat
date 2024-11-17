@@ -23,9 +23,9 @@ const io = new Server(server, {
 // Middleware
 app.use(cors());
 app.use(express.json());
-
+app.options("*", cors());
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.Mongo_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -75,9 +75,8 @@ io.on("connection", (socket) => {
 });
 
 // Routes (Add your existing API routes here)
-app.get("/", (req, res) => {
-  res.send("Backend running with Socket.IO!");
-});
+app.use("/api/user", userRouter);
+app.use("/api/chats", chatsRouter);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
