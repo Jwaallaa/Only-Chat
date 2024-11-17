@@ -46,13 +46,13 @@ io.on("connection", (socket) => {
   });
 
   // Send a message
-  socket.on("sendMessage", async (message) => {
+  socket.on("sendMessage",(message) => {
     console.log("Message received:", message.text);
     if (!message || !message.chatId || !message.text) {
       console.error("Invalid message format", message);
       return;}
     // Emit the message to the room
-    io.to(message.chatId).emit("receiveMessage", message);
+    socket.to(message.chatId).emit("receiveMessage", message);
   });
 
   // Handle disconnection

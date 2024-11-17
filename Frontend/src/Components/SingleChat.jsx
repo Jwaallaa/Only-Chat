@@ -8,7 +8,9 @@ const SingleChat = ({
   setFriendName,
   setChathistory,
   setNewMessage,
-  setShowSingleChat
+  setShowSingleChat,
+  setSocketmessage,
+  setSocketsent
 }) => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,6 +24,8 @@ const SingleChat = ({
     if (!message.trim()) return;
 
     setLoading(true);
+    setSocketsent(false);
+
     const url = "https://only-chat.onrender.com/api/chats/message";
     const token = userInfo.token;
 
@@ -53,8 +57,8 @@ const SingleChat = ({
         setMessage("");
         setLoading(false);
         setNewMessage(true);
-
-        socket.emit("sendMessage", newMessage);
+        setSocketmessage(data)
+        setSocketsent(true)
 
       } else {
         console.error("Error sending message:", data);
