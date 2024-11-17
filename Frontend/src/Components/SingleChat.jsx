@@ -9,8 +9,8 @@ const SingleChat = ({
   setChathistory,
   setNewMessage,
   setShowSingleChat,
-  setSocketmessage,
-  setSocketsent
+  setSocketsent,
+  setSocketmessage
 }) => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,9 @@ const SingleChat = ({
     if (!message.trim()) return;
 
     setLoading(true);
-    setSocketsent(false);
+    // setSocketsent(false);
+    console.log(setSocketsent);
+    
 
     const url = "https://only-chat.onrender.com/api/chats/message";
     const token = userInfo.token;

@@ -20,9 +20,7 @@ const io = new Server(server, {
   cors: {
     origin: "*", // Replace with your frontend's URL
     methods: ["GET", "POST"],
-  },
-  pingTimeout: 60000,
-  pingInterval: 25000, // Optional: Send a ping every 25 seconds
+  }// Optional: Send a ping every 25 seconds
 });
 
 // Middleware
