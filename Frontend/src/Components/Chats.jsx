@@ -78,8 +78,9 @@ const Chats = () => {
   };
 
   // Handle resizing to update mobile view detection
+  const handleResize = () => setIsMobile(window.innerWidth <= 768);
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize()
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -200,60 +201,84 @@ const Chats = () => {
       </div>
 
       <div className="chatpage">
-        {isMobile && !showSingleChat ? (
-          <div className="chatscontainer">
-            <h2>Chats</h2>
-            {loading ? (
-              <div className="spinner"></div>
-            ) : chats.length > 0 ? (
-              getUniqueChats().map((chat) => {
-                const isSenderLoggedInUser =
-                  chat.sender._id === userInfo._id;
-                const isReceiverLoggedInUser =
-                  chat.receiver._id === userInfo._id;
+        {/* For Laptop/Desktop, show both chats and single chat */}
+        {!isMobile ? (
+          <>
+            <div className="chatscontainer">
+              <h2>Chats</h2>
+              {loading ? (
+                <div className="spinner"></div>
+              ) : chats.length > 0 ? (
+                getUniqueChats().map((chat) => {
+                  const isSenderLoggedInUser =
+                    chat.sender._id === userInfo._id;
+                  return (
+                    <div key={chat._id} onClick={() => SelectedUserChat(isSenderLoggedInUser ? chat.receiver.username : chat.sender.username)}>
+                      <UserCard
+                        username={isSenderLoggedInUser ? chat.receiver.username : chat.sender.username}
+                        latestMessage={chat.text}
+                      />
+                    </div>
+                  );
+                })
+              ) : (
+                <div>No Chats Available</div>
+              )}
+            </div>
 
-                let displayUsername = "Unknown User";
-
-                if (isSenderLoggedInUser && isReceiverLoggedInUser) {
-                  displayUsername = `${chat.sender.username} (You)`;
-                } else {
-                  displayUsername = isSenderLoggedInUser
-                    ? chat.receiver.username
-                    : chat.sender.username;
-                }
-
-                return (
-                  <div
-                    key={chat._id}
-                    onClick={() => SelectedUserChat(displayUsername)}
-                  >
-                    <UserCard
-                      username={displayUsername}
-                      latestMessage={getLatestMessage(displayUsername)}
-                    />
-                  </div>
-                );
-              })
-            ) : (
-              <h3>No chats available</h3>
+            {showSingleChat && (
+              <SingleChat
+                friendName={friendName}
+                Chathistory={Chathistory}
+                setNewMessage={setNewMessage}
+                setFriendName={setFriendName}
+                loading={chatLoading}
+                showSingleChat={showSingleChat}
+                setShowSingleChat={setShowSingleChat}
+              />
             )}
-          </div>
-        ) : null}
-
-        { isMobile && showSingleChat && (
-          <SingleChat
-            friendName={friendName}
-            Chathistory={Chathistory}
-            setNewMessage={setNewMessage}
-            setFriendName={(name) => {
-              setFriendName(name);
-              setShowSingleChat(true);
-            }}
-            sendMessage={sendMessage}
-            loading={chatLoading}
-            showSingleChat={showSingleChat}
-            setShowSingleChat={setShowSingleChat}
-          />
+          </>
+        ) : (
+          // For Mobile, only show one at a time
+          <>
+            {isMobile && !showSingleChat ? (
+              <div className="chatscontainer">
+                <h2>Chats</h2>
+                {loading ? (
+                  <div className="spinner"></div>
+                ) : chats.length > 0 ? (
+                  getUniqueChats().map((chat) => {
+                    const isSenderLoggedInUser =
+                      chat.sender._id === userInfo._id;
+                    return (
+                      <div
+                        key={chat._id}
+                        onClick={() => SelectedUserChat(isSenderLoggedInUser ? chat.receiver.username : chat.sender.username)}
+                      >
+                        <UserCard
+                          username={isSenderLoggedInUser ? chat.receiver.username : chat.sender.username}
+                          latestMessage={chat.text}
+                        />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div>No Chats Available</div>
+                )}
+              </div>
+            ) : (
+              <SingleChat
+                friendName={friendName}
+                Chathistory={Chathistory}
+                setChathistory={setChathistory}
+                setNewMessage={setNewMessage}
+                setFriendName={setFriendName}
+                loading={chatLoading}
+                showSingleChat={showSingleChat}
+                setShowSingleChat={setShowSingleChat}
+              />
+            )}
+          </>
         )}
       </div>
     </>

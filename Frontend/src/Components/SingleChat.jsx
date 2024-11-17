@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./SingleChat.css";
 import Modal from "./Modal"; // Import the Modal component
-const socket = io("https://only-chat.onrender.com");
+
 const SingleChat = ({
   Chathistory,
   friendName,
   setFriendName,
   setChathistory,
   setNewMessage,
-  
+  setShowSingleChat
 }) => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,7 @@ const SingleChat = ({
         setLoading(false);
         setNewMessage(true);
 
-        socket.emit("sendMessage", data);
+        socket.emit("sendMessage", newMessage);
 
       } else {
         console.error("Error sending message:", data);
