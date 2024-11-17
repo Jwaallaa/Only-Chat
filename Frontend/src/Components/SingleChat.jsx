@@ -24,8 +24,8 @@ const SingleChat = ({
     if (!message.trim()) return;
 
     setLoading(true);
-    // setSocketsent(false);
-    console.log(setSocketsent);
+    setSocketsent(false);
+    
     
 
     const url = "https://only-chat.onrender.com/api/chats/message";
@@ -133,7 +133,7 @@ const SingleChat = ({
 
                 return (
                   <div
-                    key={chat._id}
+                    key={index}
                     className={`message ${isSentByUser ? "sent" : "received"}`}
                   >
                     {!isLastMessageFromSameSender && (

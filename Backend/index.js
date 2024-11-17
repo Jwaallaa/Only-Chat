@@ -54,6 +54,7 @@ io.on("connection", (socket) => {
       return;}
     // Emit the message to the room
     socket.to(message.chatId).emit("receiveMessage", message);
+    
   });
 
   // Handle disconnection

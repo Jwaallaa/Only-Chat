@@ -93,6 +93,7 @@ const Chats = () => {
       // Update the chat history with the new message
       console.log(message)
       setChathistory((Chathistory)=> [...Chathistory, message])
+      
     });
 
     return () => {
@@ -103,7 +104,10 @@ const Chats = () => {
   // Emit message to Socket.IO server
 
 useEffect(() => {
-  socket.emit("sendMessage", socketmessage);
+  if (socketsent) {
+    socket.emit("sendMessage", socketmessage);
+  }
+  
 },[socketsent])
 
   
