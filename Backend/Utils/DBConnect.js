@@ -10,7 +10,7 @@ const clientOptions = { serverApi: { version: '1', strict: true, deprecationErro
 
 const DBConnect = async () => {
     try {
-        await mongoose.connect(process.env.Mongo_URI , clientOptions)
+        await mongoose.connect(process.env.MONGO_URI , clientOptions)
         console.log("Connected to MongoDB");
         } catch (error) {
             console.log("Error connecting to MongoDB:", error.message); 
