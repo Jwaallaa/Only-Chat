@@ -48,16 +48,8 @@ io.on("connection", (socket) => {
   // Send a message
   socket.on("sendMessage", async (message) => {
     console.log("Message received:", message);
-
-    // Save message to the database
-    const newMessage = await Chat.create({
-      sender: message.senderId,
-      receiver: message.receiverId,
-      text: message.text,
-    });
-
     // Emit the message to the room
-    io.to(message.chatId).emit("receiveMessage", newMessage);
+    io.to(message.chatId).emit("receiveMessage", message);
   });
 
   // Handle disconnection

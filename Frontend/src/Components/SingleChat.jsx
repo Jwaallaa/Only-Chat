@@ -41,7 +41,7 @@ const SingleChat = ({
       });
 
       const data = await response.json();
-      console.log(data)
+     
 
       const newMessage = {
         ...data,
@@ -53,6 +53,8 @@ const SingleChat = ({
         setMessage("");
         setLoading(false);
         setNewMessage(true);
+
+        socket.emit("sendMessage", data);
 
       } else {
         console.error("Error sending message:", data);

@@ -98,15 +98,6 @@ const Chats = () => {
   }, [userInfo._id]);
 
   // Emit message to Socket.IO server
-  const sendMessage = (messageText, receiverId) => {
-    const message = {
-      senderId: userInfo._id,
-      receiverId,
-      text: messageText,
-      chatId: `${userInfo._id}-${receiverId}`,
-    };
-    socket.emit("sendMessage", message);
-  };
 
   useEffect(() => {
     fetchChats();
