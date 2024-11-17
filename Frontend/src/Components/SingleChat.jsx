@@ -104,7 +104,9 @@ const SingleChat = ({
           <div className="head">
             <i
               className="fa-sharp fa-solid fa-arrow-left"
-              onClick={() => setFriendName("")}
+              onClick={() => {setFriendName("");
+                setShowSingleChat(false);}
+              }
             ></i>
             <h2>{friendName}</h2>
             <i

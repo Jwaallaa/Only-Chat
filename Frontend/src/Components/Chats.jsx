@@ -4,129 +4,159 @@ import Navbar from "./Navbar";
 import UserCard from "./UserCard";
 import "./Chats.css";
 import SingleChat from "./SingleChat";
+import io from "socket.io-client";
 
-// Utility Functions
-const getUniqueChats = (chats) => {
-  const chatMap = new Map();
-
-  chats.forEach((chat) => {
-    const userPairKey =
-      chat.sender._id < chat.receiver._id
-        ? `${chat.sender._id}-${chat.receiver._id}`
-        : `${chat.receiver._id}-${chat.sender._id}`;
-
-    if (
-      chatMap.has(userPairKey) &&
-      new Date(chatMap.get(userPairKey).createdAt) > new Date(chat.createdAt)
-    ) {
-      return;
-    }
-
-    chatMap.set(userPairKey, chat);
-  });
-
-  return Array.from(chatMap.values()).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
-};
-
-const getLatestMessage = (chats, username, userInfo) => {
-  const userChats = chats.filter(
-    (chat) =>
-      (chat.sender.username === username ||
-        chat.receiver.username === username) &&
-      (chat.sender._id === userInfo._id || chat.receiver._id === userInfo._id)
-  );
-
-  if (userChats.length > 0) {
-    userChats.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    return userChats[0].text;
-  }
-  return "No messages yet";
-};
+// Setup Socket.IO connection to the server
+const socket = io("https://only-chat.onrender.com");
 
 const Chats = () => {
   const [searchbox, setsearchbox] = useState("");
   const [chats, setChats] = useState([]);
   const [friendName, setFriendName] = useState("");
   const [Chathistory, setChathistory] = useState([]);
+  const navigate = useNavigate();
   const [usersearch, setUsersearch] = useState([]);
-  const [loading, setLoading] = useState({ chatsLoading: true, searchLoading: false });
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const [search, setSearch] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [chatLoading, setChatLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showSingleChat, setShowSingleChat] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
 
-  const navigate = useNavigate();
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
-
   // Fetch chats
-  useEffect(() => {
-    let isMounted = true;
-    const fetchChats = async () => {
-      if (!userInfo.token) return;
+  const fetchChats = async () => {
+    if (!userInfo || !userInfo.token) return;
 
-      try {
-        const response = await fetch("https://only-chat.onrender.com/api/chats", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${userInfo.token}` },
-        });
+    const token = userInfo.token;
 
-        if (!response.ok) throw new Error("Failed to fetch chats.");
+    try {
+      const response = await fetch("https://only-chat.onrender.com/api/chats", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const data = await response.json();
-        if (isMounted) {
-          setChats(data);
-          setLoading((prev) => ({ ...prev, chatsLoading: false }));
-        }
-      } catch (error) {
-        console.error("Error fetching chats:", error);
-        if (isMounted) setLoading((prev) => ({ ...prev, chatsLoading: false }));
-      }
-    };
+      if (!response.ok) throw new Error("Network response was not ok");
 
-    fetchChats();
-    return () => {
-      isMounted = false;
-    };
-  }, [newMessage, userInfo.token]);
+      const data = await response.json();
+      setChats(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+      setLoading(false);
+    }
+  };
 
   // Fetch chat history for a selected user
   const SelectedUserChat = async (username) => {
-    setLoading((prev) => ({ ...prev, searchLoading: true }));
+    setChatLoading(true);
+    const token = userInfo.token;
 
     try {
       const response = await fetch(
         `https://only-chat.onrender.com/api/chats/${username}`,
         {
           method: "GET",
-          headers: { Authorization: `Bearer ${userInfo.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      if (!response.ok) throw new Error("Failed to fetch chat history.");
-
+      if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
+      console.log(data);
       setChathistory(data);
       setFriendName(username);
-      setShowSingleChat(isMobile); // Show single chat view on mobile
-      setLoading((prev) => ({ ...prev, searchLoading: false }));
+      setChatLoading(false);
+      setNewMessage(false);
+      if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
-      setLoading((prev) => ({ ...prev, searchLoading: false }));
+      setChatLoading(false);
     }
   };
 
-  // Handle resizing
+  // Handle resizing to update mobile view detection
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Redirect to login page if not logged in
-  const handleLoginRedirect = () => navigate("/Only-Chat");
+  // Handle incoming messages via Socket.IO
+  useEffect(() => {
+    socket.on("receiveMessage", (message) => {
+      // Update the chat history with the new message
+      if (message.sender === userInfo._id || message.receiver === userInfo._id) {
+        setNewMessage(true); // Trigger state change to fetch new chats
+        fetchChats(); // Optionally, fetch new chats after a message arrives
+      }
+    });
 
-  return !userInfo.token ? (
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, [userInfo._id]);
+
+  // Emit message to Socket.IO server
+  const sendMessage = (messageText, receiverId) => {
+    const message = {
+      senderId: userInfo._id,
+      receiverId,
+      text: messageText,
+      chatId: `${userInfo._id}-${receiverId}`,
+    };
+    socket.emit("sendMessage", message);
+  };
+
+  useEffect(() => {
+    fetchChats();
+  }, [newMessage]);
+
+  const handleLoginRedirect = () => {
+    navigate("/Only-Chat");
+  };
+
+  const getLatestMessage = (username) => {
+    const userChats = chats.filter(
+      (chat) =>
+        (chat.sender.username === username || chat.receiver.username === username) &&
+      (chat.sender._id === userInfo._id || chat.receiver._id === userInfo._id)
+    );
+
+    if (userChats.length > 0) {
+      userChats.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by date
+      return userChats[0].text;
+    }
+    return "No messages yet";
+  };
+
+  const getUniqueChats = () => {
+    const chatMap = new Map();
+
+    chats.forEach((chat) => {
+      const userPairKey =
+        chat.sender._id < chat.receiver._id
+          ? `${chat.sender._id}-${chat.receiver._id}`
+          : `${chat.receiver._id}-${chat.sender._id}`;
+
+      if (
+        chatMap.has(userPairKey) &&
+        new Date(chatMap.get(userPairKey).createdAt) > new Date(chat.createdAt)
+      ) {
+        return;
+      }
+
+      chatMap.set(userPairKey, chat);
+    });
+
+    const uniqueChats = Array.from(chatMap.values()).sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    return uniqueChats;
+  };
+
+  return !userInfo || !userInfo.token ? (
     <div className="noLogin">
       <h2>First, log in to see your chats.</h2>
       <button onClick={handleLoginRedirect}>Go to Login Page</button>
@@ -135,26 +165,69 @@ const Chats = () => {
     <>
       <Navbar
         setUsersearch={setUsersearch}
-        setSearch={setShowSingleChat}
-        setLoading={(isLoading) =>
-          setLoading((prev) => ({ ...prev, searchLoading: isLoading }))
-        }
+        setSearch={setSearch}
+        setLoading={setLoading}
         searchbox={searchbox}
         setsearchbox={setsearchbox}
       />
 
+      <div className={`searchedusers ${search ? "show" : ""}`}>
+        <div className="innerbox">
+          <div>
+            <h1>Users</h1>
+            <i
+              onClick={() => {
+                setSearch(false);
+                setLoading(false);
+                setsearchbox("");
+              }}
+              className="fa-duotone fa-solid fa-xmark"
+            ></i>
+          </div>
+          {loading ? (
+            <div className="spinner"></div>
+          ) : usersearch.length > 0 ? (
+            usersearch.map((suser) => (
+              <div key={suser._id}>
+                <UserCard
+                  username={suser.name}
+                  latestMessage={getLatestMessage(suser.username)}
+                  onClick={() => {
+                    SelectedUserChat(suser.username);
+                    setSearch(false);
+                    setShowSingleChat(true);
+                  }}
+                />
+              </div>
+            ))
+          ) : (
+            <h3>No results found</h3>
+          )}
+        </div>
+      </div>
+
       <div className="chatpage">
-        {!isMobile || !showSingleChat ? (
+        {isMobile && !showSingleChat ? (
           <div className="chatscontainer">
             <h2>Chats</h2>
-            {loading.chatsLoading ? (
+            {loading ? (
               <div className="spinner"></div>
             ) : chats.length > 0 ? (
-              getUniqueChats(chats).map((chat) => {
-                const isSender = chat.sender._id === userInfo._id;
-                const displayUsername = isSender
-                  ? chat.receiver.username
-                  : chat.sender.username;
+              getUniqueChats().map((chat) => {
+                const isSenderLoggedInUser =
+                  chat.sender._id === userInfo._id;
+                const isReceiverLoggedInUser =
+                  chat.receiver._id === userInfo._id;
+
+                let displayUsername = "Unknown User";
+
+                if (isSenderLoggedInUser && isReceiverLoggedInUser) {
+                  displayUsername = `${chat.sender.username} (You)`;
+                } else {
+                  displayUsername = isSenderLoggedInUser
+                    ? chat.receiver.username
+                    : chat.sender.username;
+                }
 
                 return (
                   <div
@@ -163,7 +236,7 @@ const Chats = () => {
                   >
                     <UserCard
                       username={displayUsername}
-                      latestMessage={getLatestMessage(chats, displayUsername, userInfo)}
+                      latestMessage={getLatestMessage(displayUsername)}
                     />
                   </div>
                 );
@@ -174,16 +247,19 @@ const Chats = () => {
           </div>
         ) : null}
 
-        {isMobile && showSingleChat && (
+        { isMobile && showSingleChat && (
           <SingleChat
             friendName={friendName}
             Chathistory={Chathistory}
             setNewMessage={setNewMessage}
             setFriendName={(name) => {
               setFriendName(name);
-              setShowSingleChat(false);
+              setShowSingleChat(true);
             }}
-            setChathistory={setChathistory}
+            sendMessage={sendMessage}
+            loading={chatLoading}
+            showSingleChat={showSingleChat}
+            setShowSingleChat={setShowSingleChat}
           />
         )}
       </div>
