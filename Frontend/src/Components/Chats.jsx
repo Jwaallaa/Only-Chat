@@ -5,8 +5,6 @@ import UserCard from "./UserCard";
 import "./Chats.css";
 import SingleChat from "./SingleChat";
 
-
-
 const Chats = () => {
   const [searchbox, setsearchbox] = useState("");
   const [chats, setChats] = useState([]);
@@ -21,17 +19,7 @@ const Chats = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showSingleChat, setShowSingleChat] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const [chatId, setChatId] = useState(null);
-  const [socketmessage , setSoketmessage] = useState({});
   // Fetch chats
-
-  
-    
-    
- 
-  
-  
-
 
   const fetchChats = async () => {
     if (!userInfo || !userInfo.token) return;
@@ -70,13 +58,12 @@ const Chats = () => {
       );
 
       if (!response.ok) throw new Error("Network response was not ok");
-
       const data = await response.json();
+      console.log(data);
       setChathistory(data);
       setFriendName(username);
       setChatLoading(false);
       setNewMessage(false);
-      setChatId(data[0].chatId)
       if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
@@ -102,17 +89,17 @@ const Chats = () => {
   // Function to get the latest message for a user
   // Function to get the latest message for a user
   const getLatestMessage = (username) => {
-    
-
     const userChats = chats.filter(
       (chat) =>
-        chat.sender.username === username || chat.receiver.username === username
+        (chat.sender.username === username || chat.receiver.username === username) &&
+      (chat.sender._id === userInfo._id || chat.receiver._id === userInfo._id)
     );
-    
 
     // If there are messages, sort by creation date and get the most recent
     if (userChats.length > 0) {
       userChats.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort descending by date
+      console.log(userChats[0].text);
+      
       return userChats[0].text; // Return the most recent message text
     }
     return "No messages yet"; // Default text if no messages
@@ -120,7 +107,7 @@ const Chats = () => {
 
   const getUniqueChats = () => {
     const chatMap = new Map();
-  
+
     // Iterate over each chat to store the latest chat for each unique user pair
     chats.forEach((chat) => {
       // Create a unique key for the user pair by sorting their IDs lexicographically
@@ -128,7 +115,7 @@ const Chats = () => {
         chat.sender._id < chat.receiver._id
           ? `${chat.sender._id}-${chat.receiver._id}`
           : `${chat.receiver._id}-${chat.sender._id}`;
-  
+
       // If this pair already exists in the map, keep only the latest chat message
       if (
         chatMap.has(userPairKey) &&
@@ -136,19 +123,18 @@ const Chats = () => {
       ) {
         return; // Skip this chat if it's older
       }
-  
+
       // Set the latest chat for this user pair in the map
       chatMap.set(userPairKey, chat);
     });
-  
+
     // Convert the map values to an array and sort by createdAt in descending order
     const uniqueChats = Array.from(chatMap.values()).sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
-  
+
     return uniqueChats;
   };
-  
 
   return !userInfo || !userInfo.token ? (
     <div className="noLogin">
@@ -189,6 +175,7 @@ const Chats = () => {
                   onClick={() => {
                     SelectedUserChat(suser.username);
                     setSearch(false);
+                    setShowSingleChat(true);
                   }}
                 />
               </div>
@@ -208,12 +195,23 @@ const Chats = () => {
             ) : chats.length > 0 ? (
               getUniqueChats().map((chat) => {
                 const isSenderLoggedInUser =
-                  chat.sender && chat.sender._id === userInfo._id;
-                const displayUsername = isSenderLoggedInUser
-                  ? chat.receiver.username
-                  : chat.sender
-                  ? chat.sender.username
-                  : "Unknown User";
+                  chat.sender === userInfo._id;
+                const isReceiverLoggedInUser =
+                  chat.receiver === userInfo._id;
+
+                let displayUsername = "Unknown User";
+
+                if (isSenderLoggedInUser && isReceiverLoggedInUser) {
+                  // If sender and receiver are the logged-in user
+                  displayUsername = `${chat.sender.username} (You)`;
+                } else {
+                  // If the logged-in user is only the sender or receiver
+                  displayUsername = isSenderLoggedInUser
+                    ? chat.receiver.username
+                    : chat.sender
+                    ? chat.sender.username
+                    : "Unknown User";
+                }
 
                 return (
                   <div
@@ -243,9 +241,6 @@ const Chats = () => {
               setShowSingleChat(false); // Return to chat list on mobile when closing chat
             }}
             setChathistory={setChathistory}
-            // setChatId={setChatId}
-            socketmessage={socketmessage}
-            setSocketmessage={setSoketmessage}
           />
         )}
       </div>
@@ -254,3 +249,4 @@ const Chats = () => {
 };
 
 export default Chats;
+
