@@ -21,6 +21,8 @@ const io = new Server(server, {
     origin: "*", // Replace with your frontend's URL
     methods: ["GET", "POST"],
   },
+  pingTimeout: 60000,
+  pingInterval: 25000, // Optional: Send a ping every 25 seconds
 });
 
 // Middleware
@@ -39,6 +41,7 @@ DBConnect();
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
+  
   // Join a room
   socket.on("joinRoom", (chatId) => {
     socket.join(chatId);
