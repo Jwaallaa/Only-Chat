@@ -7,6 +7,7 @@ import cors from "cors";
 import userRouter from "./routes/userRouter.js";
 import DBConnect from "./Utils/DBConnect.js";
 import chatsRouter from "./routes/chatsRouter.js";
+import Chat from "./models/chatModel.js";
 // Load environment variables
 dotenv.config();
 
@@ -29,23 +30,10 @@ app.use(express.json());
 app.options("*", cors());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+DBConnect();
 
 // Example chat and user models
-const Chat = mongoose.model("Chat", new mongoose.Schema({
-  sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  receiver: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  text: String,
-  createdAt: { type: Date, default: Date.now },
-}));
 
-const User = mongoose.model("User", new mongoose.Schema({
-  username: String,
-  email: String,
-  password: String,
-}));
 
 // Socket.IO event handling
 io.on("connection", (socket) => {
