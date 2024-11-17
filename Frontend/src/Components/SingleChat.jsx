@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./SingleChat.css";
 import Modal from "./Modal"; // Import the Modal component
-
+const socket = io("https://only-chat.onrender.com");
 const SingleChat = ({
   Chathistory,
   friendName,

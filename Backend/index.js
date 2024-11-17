@@ -47,7 +47,7 @@ io.on("connection", (socket) => {
 
   // Send a message
   socket.on("sendMessage", async (message) => {
-    console.log("Message received:", message);
+    console.log("Message received:", message.text);
     // Emit the message to the room
     io.to(message.chatId).emit("receiveMessage", message);
   });

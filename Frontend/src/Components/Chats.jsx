@@ -69,6 +69,8 @@ const Chats = () => {
       setChatLoading(false);
       setNewMessage(false);
       if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
+
+      socket.emit('joinRoom' , data[0].chatId )
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
       setChatLoading(false);
