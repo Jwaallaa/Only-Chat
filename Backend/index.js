@@ -40,6 +40,11 @@ DBConnect();
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
+  //setup
+  socket.on("setup", (userData) => {
+    socket.join(userData._id);
+    console.log('connected successfully');
+  })
   
   // Join a room
   socket.on("joinRoom", (chatId) => {
@@ -50,53 +55,13 @@ io.on("connection", (socket) => {
   // Send a message
   socket.on("sendMessage",(message) => {
     console.log("Message received:", message.text);
-    if (!message || !message.chatId || !message.text) {
+    if (!message || !message.receiver._id || !message.text) {
       console.error("Invalid message format", message);
       return;}
     // Emit the message to the room
-    socket.to(message.chatId).emit("receiveMessage", message);
+    socket.to(message.receiver._id).emit("receiveMessage", message);
   });
 
-socket.on('directMessage', async (message) => {
-    console.log("Direct message received:", message.text);
-
-    // Validate message structure
-    if (!message || !message.senderId || !message.receiverId || !message.text) {
-        console.error("Invalid direct message format", message);
-        return;
-    }
-
-    try {
-        // Fetch sender and receiver details from the database
-        const sender = await User.findById(message.senderId).select('username');
-        const receiver = await User.findById(message.receiverId).select('username');
-
-        if (!sender || !receiver) {
-            console.error("Sender or receiver not found in database");
-            return;
-        }
-
-        // Construct the updated message object
-        const updatedMessage = {
-            ...message,
-            sender: {
-                _id: message.senderId,
-                username: sender.username,
-            },
-            receiver: {
-                _id: message.receiverId,
-                username: receiver.username,
-            },
-        };
-
-        // Emit the updated message to the receiver
-        socket.to(message.receiverId).emit("receiveDirectMessage", updatedMessage);
-        console.log("Message sent to receiver:", updatedMessage);
-
-    } catch (error) {
-        console.error("Error fetching sender/receiver data:", error);
-    }
-});
 
   
 
