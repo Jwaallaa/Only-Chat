@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
   // Send a message
   socket.on("sendMessage",(message) => {
     console.log("Message received:", message.text);
-    if (!message || !message.receiver._id || !message.text) {
+    if (!message) {
       console.error("Invalid message format", message);
       return;}
     // Emit the message to the room
