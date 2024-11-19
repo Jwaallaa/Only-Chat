@@ -101,11 +101,19 @@ const Chats = () => {
     };
   });
 
+  // Handle incoming message when receiver is not in chatroom
+  socket.on('receiveDirectMessage' , (message) => {
+    console.log(message);
+    setChats((chats)=>[...Chats , message] );
+});
+
+
   // Emit message to Socket.IO server
 
 useEffect(() => {
   if (socketsent) {
     socket.emit("sendMessage", socketmessage);
+    socket.emit('directMessage', socketmessage);
   }
   
 },[socketsent])
