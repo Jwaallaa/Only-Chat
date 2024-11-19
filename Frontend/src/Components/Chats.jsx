@@ -23,8 +23,13 @@ const Chats = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showSingleChat, setShowSingleChat] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const [socketmessage, setSocketmessage] = useState({})
-  const [socketsent , setSocketsent] = useState(true);
+  const [socketmessage, setSocketmessage] = useState({});
+  const [socketsent, setSocketsent] = useState(true);
+
+  //socket io setup
+  useEffect(() => {
+    socket.emit("setup", userInfo);
+  });
 
   // Fetch chats
   const fetchChats = async () => {
@@ -72,7 +77,7 @@ const Chats = () => {
       setNewMessage(false);
       if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
 
-      socket.emit('joinRoom' , data[0].chatId )
+      socket.emit("joinRoom", data[0].chatId);
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
       setChatLoading(false);
@@ -82,7 +87,7 @@ const Chats = () => {
   // Handle resizing to update mobile view detection
   const handleResize = () => setIsMobile(window.innerWidth <= 768);
   useEffect(() => {
-    handleResize()
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -90,42 +95,32 @@ const Chats = () => {
   // Handle incoming messages via Socket.IO
   useEffect(() => {
     socket.on("receiveMessage", (message) => {
-      // Update the chat history with the new message
-      console.log(message)
-      setChathistory((Chathistory)=> [...Chathistory, message])
-      
+      if (
+        !showSingleChat // if chat is not selected or doesn't match current chat
+      ) {
+        console.log(message.text);
+      } else {
+        setChathistory((Chathistory) => [...Chathistory, message]);
+      }
+
+      return () => {
+        socket.off("receiveMessage");
+      };
     });
-
-    return () => {
-      socket.off("receiveMessage");
-    };
   });
-
-  // Handle incoming message when receiver is not in chatroom
-  socket.on('receiveDirectMessage' , (message) => {
-    console.log(message);
-    setChats((chats)=>[...Chats , message] );
-});
-
 
   // Emit message to Socket.IO server
 
-useEffect(() => {
-  if (socketsent) {
-    socket.emit("sendMessage", socketmessage);
-    socket.emit('directMessage', socketmessage);
-  }
-  
-},[socketsent])
+  useEffect(() => {
+    if (socketsent) {
+      console.log("Emitting Message:", socketmessage);
+      socket.emit("sendMessage", socketmessage);
+    }
+  }, [socketsent]);
 
-  
   // Send the message to the receiver's socket
-  
-  
-
 
   useEffect(() => {
-
     fetchChats();
   }, [newMessage]);
 
@@ -136,8 +131,9 @@ useEffect(() => {
   const getLatestMessage = (username) => {
     const userChats = chats.filter(
       (chat) =>
-        (chat.sender.username === username || chat.receiver.username === username) &&
-      (chat.sender._id === userInfo._id || chat.receiver._id === userInfo._id)
+        (chat.sender.username === username ||
+          chat.receiver.username === username) &&
+        (chat.sender._id === userInfo._id || chat.receiver._id === userInfo._id)
     );
 
     if (userChats.length > 0) {
@@ -225,7 +221,7 @@ useEffect(() => {
 
       <div className="chatpage">
         {/* For Laptop/Desktop, show both chats and single chat */}
-        { !isMobile ? (
+        {!isMobile ? (
           <>
             <div className="chatscontainer">
               <h2>Chats</h2>
@@ -233,12 +229,24 @@ useEffect(() => {
                 <div className="spinner"></div>
               ) : chats.length > 0 ? (
                 getUniqueChats().map((chat) => {
-                  const isSenderLoggedInUser =
-                    chat.sender._id === userInfo._id;
+                  const isSenderLoggedInUser = chat.sender._id === userInfo._id;
                   return (
-                    <div key={chat._id} onClick={() => SelectedUserChat(isSenderLoggedInUser ? chat.receiver.username : chat.sender.username)}>
+                    <div
+                      key={chat._id}
+                      onClick={() =>
+                        SelectedUserChat(
+                          isSenderLoggedInUser
+                            ? chat.receiver.username
+                            : chat.sender.username
+                        )
+                      }
+                    >
                       <UserCard
-                        username={isSenderLoggedInUser ? chat.receiver.username : chat.sender.username}
+                        username={
+                          isSenderLoggedInUser
+                            ? chat.receiver.username
+                            : chat.sender.username
+                        }
                         latestMessage={chat.text}
                       />
                     </div>
@@ -249,68 +257,67 @@ useEffect(() => {
               )}
             </div>
 
-            
-              <SingleChat
-                friendName={friendName}
-                Chathistory={Chathistory}
-                setChathistory={setChathistory}
-                setNewMessage={setNewMessage}
-                setFriendName={setFriendName}
-                loading={chatLoading}
-                showSingleChat={showSingleChat}
-                setShowSingleChat={setShowSingleChat}
-                setSocketmessage={setSocketmessage}
-                setSocketsent={setSocketsent}
-              />
-            
+            <SingleChat
+              friendName={friendName}
+              Chathistory={Chathistory}
+              setChathistory={setChathistory}
+              setNewMessage={setNewMessage}
+              setFriendName={setFriendName}
+              loading={chatLoading}
+              showSingleChat={showSingleChat}
+              setShowSingleChat={setShowSingleChat}
+              setSocketmessage={setSocketmessage}
+              setSocketsent={setSocketsent}
+            />
           </>
+        ) : // For Mobile, only show one at a time
+        !showSingleChat ? (
+          <div className="chatscontainer">
+            <h2>Chats</h2>
+            {loading ? (
+              <div className="spinner"></div>
+            ) : chats.length > 0 ? (
+              getUniqueChats().map((chat) => {
+                const isSenderLoggedInUser = chat.sender._id === userInfo._id;
+                return (
+                  <div
+                    key={chat._id}
+                    onClick={() => {
+                      SelectedUserChat(
+                        isSenderLoggedInUser
+                          ? chat.receiver.username
+                          : chat.sender.username
+                      );
+                    }}
+                  >
+                    <UserCard
+                      username={
+                        isSenderLoggedInUser
+                          ? chat.receiver.username
+                          : chat.sender.username
+                      }
+                      latestMessage={chat.text}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <div>No Chats Available</div>
+            )}
+          </div>
         ) : (
-          // For Mobile, only show one at a time
-          !showSingleChat ?
-          (
-            
-              <div className="chatscontainer">
-                <h2>Chats</h2>
-                {loading ? (
-                  <div className="spinner"></div>
-                ) : chats.length > 0 ? (
-                  getUniqueChats().map((chat) => {
-                    const isSenderLoggedInUser =
-                      chat.sender._id === userInfo._id;
-                    return (
-                      <div
-                        key={chat._id}
-                        onClick={() => {
-                          SelectedUserChat(isSenderLoggedInUser ? chat.receiver.username : chat.sender.username)
-                          
-                        }}
-                      >
-                        <UserCard
-                          username={isSenderLoggedInUser ? chat.receiver.username : chat.sender.username}
-                          latestMessage={chat.text}
-                        />
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div>No Chats Available</div>
-                )}
-              </div>)
-              :(
-              <SingleChat
-                friendName={friendName}
-                Chathistory={Chathistory}
-                setChathistory={setChathistory}
-                setNewMessage={setNewMessage}
-                setFriendName={setFriendName}
-                loading={chatLoading}
-                showSingleChat={showSingleChat}
-                setShowSingleChat={setShowSingleChat}
-                setSocketmessage={setSocketmessage}
-                setSocketsent={setSocketsent}
-              />)
-            
-          
+          <SingleChat
+            friendName={friendName}
+            Chathistory={Chathistory}
+            setChathistory={setChathistory}
+            setNewMessage={setNewMessage}
+            setFriendName={setFriendName}
+            loading={chatLoading}
+            showSingleChat={showSingleChat}
+            setShowSingleChat={setShowSingleChat}
+            setSocketmessage={setSocketmessage}
+            setSocketsent={setSocketsent}
+          />
         )}
       </div>
     </>
