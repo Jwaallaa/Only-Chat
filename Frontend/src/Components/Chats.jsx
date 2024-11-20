@@ -123,23 +123,25 @@ useEffect(() => {
     setChathistory((prevChathistory) => [...prevChathistory, updatedChat]);
 
     if (!showSingleChat) {
-      setChatlist((chatlist) =>
-        chatlist.map((chat) => {
-          if (
+      setChatlist((chatlist) => {
+        let updatedChat;
+        const updatedChatlist = chatlist.filter((chat) => {
+          const isMatch =
             (chat.sender._id === message.sender._id && chat.receiver._id === message.receiver._id) ||
-            (chat.sender._id === message.receiver._id && chat.receiver._id === message.sender._id)
-          ) {
-            console.log(chat);
-            return {
-              ...chat,
-              text: message.text,
-              createdAt: message.createdAt,
-            };
+            (chat.sender._id === message.receiver._id && chat.receiver._id === message.sender._id);
+          
+          if (isMatch) {
+            updatedChat = { ...chat, text: message.text, createdAt: message.createdAt };
+            return false; // Remove the updated chat from the array
           }
-          return chat; // Always return the original chat if no match
-        })
-      );
+          return true; // Keep the other chats
+        });
+    
+        // Prepend the updated chat at the top if found
+        return updatedChat ? [updatedChat, ...updatedChatlist] : updatedChatlist;
+      });
     }
+    
     };
 
   socketRef.current?.on("receiveMessage", handleMessage);
