@@ -7,9 +7,7 @@ import SingleChat from "./SingleChat";
 import io from "socket.io-client";
 import { useRef } from "react";
 
-
-
-const port = "https://only-chat.onrender.com" //http://localhost:3000
+const port = "https://only-chat.onrender.com"; //http://localhost:3000
 
 // Setup Socket.IO connection to the server
 
@@ -27,24 +25,22 @@ const Chats = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showSingleChat, setShowSingleChat] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const [chatlist, setChatlist] = useState([])
-  
+  const [chatlist, setChatlist] = useState([]);
+
   //socket io setup
   const socketRef = useRef(null);
-  
+
   useEffect(() => {
     if (!socketRef.current) {
       socketRef.current = io(port);
       socketRef.current.emit("setup", userInfo);
     }
-  
+
     // return () => {
     //   socketRef.current?.disconnect();
     //   socketRef.current = null;
     // };
-  }, [userInfo]); 
-
-
+  }, [userInfo]);
 
   // Fetch chats
   const fetchChats = async () => {
@@ -75,24 +71,18 @@ const Chats = () => {
     const token = userInfo.token;
 
     try {
-      const response = await fetch(
-        `${port}/api/chats/${username}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`${port}/api/chats/${username}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
-      console.log(data);
       setChathistory(data);
       setFriendName(username);
       setChatLoading(false);
       setNewMessage(false);
       if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
-
-
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
       setChatLoading(false);
@@ -108,57 +98,74 @@ const Chats = () => {
   }, []);
 
   // Handle incoming messages via Socket.IO
-// Handle incoming messages via Socket.IO
-useEffect(() => {
-  const handleMessage = (message) => {
-    const updatedChat = {
-      _id: message.chatId,
-      sender: message.sender._id,
-      receiver: message.receiver._id,
-      text: message.text,
-      createdAt: message.createdAt,
-      updatedAt: message.updatedAt,
-    };
+  // Handle incoming messages via Socket.IO
+  useEffect(() => {
+    const handleMessage = (message) => {
+      const updatedChat = {
+        _id: message.chatId,
+        sender: message.sender._id,
+        receiver: message.receiver._id,
+        text: message.text,
+        createdAt: message.createdAt,
+        updatedAt: message.updatedAt,
+      };
 
-    setChathistory((prevChathistory) => [...prevChathistory, updatedChat]);
+      setChathistory((prevChathistory) => [...prevChathistory, updatedChat]);
 
-    if (!showSingleChat) {
-      setChatlist((chatlist) => {
-        let updatedChat;
-        const updatedChatlist = chatlist.filter((chat) => {
-          const isMatch =
-            (chat.sender._id === message.sender._id && chat.receiver._id === message.receiver._id) ||
-            (chat.sender._id === message.receiver._id && chat.receiver._id === message.sender._id);
-          
-          if (isMatch) {
-            updatedChat = { ...chat, text: message.text, createdAt: message.createdAt };
-            return false; // Remove the updated chat from the array
+      if (!showSingleChat) {
+        if(message.sender._id){
+        setChatlist((chatlist) => {
+          let updatedChat;
+          var isMatch;
+          const updatedChatlist = chatlist.filter((chat) => {
+            isMatch =
+              (chat.sender._id === message.sender._id &&
+                chat.receiver._id === message.receiver._id) ||
+              (chat.sender._id === message.receiver._id &&
+                chat.receiver._id === message.sender._id);
+
+            if (isMatch) {
+              updatedChat = {
+                ...chat,
+                text: message.text,
+                createdAt: message.createdAt,
+                unreadCount: chat.unreadCount + 1,
+              };
+              return false; // Remove the updated chat from the array
+            }
+            return true; // Keep the other chats
+          });
+          console.log(updatedChat);
+          // Prepend the updated chat at the top if found
+          if(isMatch){
+          return updatedChat
+            ? [updatedChat, ...updatedChatlist]
+            : updatedChatlist;
           }
-          return true; // Keep the other chats
+          if(!isMatch){
+            updatedChat = {
+              ...message,
+              unreadCount: 1,
+            }
+            console.log(updatedChat)
+            setChats((chats)=>[updatedChat,...chats])
+            return [updatedChat, ...updatedChatlist];
+
+          }
         });
-    
-        // Prepend the updated chat at the top if found
-        return updatedChat ? [updatedChat, ...updatedChatlist] : updatedChatlist;
-      });
-    }
-    
+      }}
     };
 
-  socketRef.current?.on("receiveMessage", handleMessage);
+    socketRef.current?.on("receiveMessage", handleMessage);
 
-  return () => {
-    socketRef.current?.off("receiveMessage", handleMessage);
-  };
-}, [showSingleChat]);
-
-
+    return () => {
+      socketRef.current?.off("receiveMessage", handleMessage);
+    };
+  }, [showSingleChat]);
 
   // Include 'chats' so that the chat updates are reflected
 
-
   // Emit message to Socket.IO server
-
-  
 
   // Send the message to the receiver's socket
 
@@ -169,7 +176,6 @@ useEffect(() => {
   useEffect(() => {
     getUniqueChats();
   }, [chats]);
-  
 
   const handleLoginRedirect = () => {
     navigate("/Only-Chat");
@@ -192,30 +198,40 @@ useEffect(() => {
 
   const getUniqueChats = () => {
     const chatMap = new Map();
-  
+
+    
     chats.forEach((chat) => {
+
+      if (!chat || !chat.sender || !chat.receiver || !chat.sender._id || !chat.receiver._id) {
+        console.warn("Skipping invalid chat entry:", chat);
+        return; // Skip this iteration
+      }
+
+
       const userPairKey =
         chat.sender._id < chat.receiver._id
           ? `${chat.sender._id}-${chat.receiver._id}`
           : `${chat.receiver._id}-${chat.sender._id}`;
-  
+
       if (
         chatMap.has(userPairKey) &&
         new Date(chatMap.get(userPairKey).createdAt) > new Date(chat.createdAt)
       ) {
         return;
       }
-  
+
       chatMap.set(userPairKey, chat);
     });
-  
-    const uniqueChats = Array.from(chatMap.values()).sort(
+
+    let uniqueChats = Array.from(chatMap.values()).sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
-    console.log(uniqueChats)
+
+    uniqueChats = uniqueChats.map((uniqueChat) => {
+      return { ...uniqueChat, unreadCount: 0 };
+    });
     setChatlist(uniqueChats);
   };
-  
 
   return !userInfo || !userInfo.token ? (
     <div className="noLogin">
@@ -281,13 +297,21 @@ useEffect(() => {
                   return (
                     <div
                       key={chat._id}
-                      onClick={() =>
+                      onClick={() => {
+                        // Reset unread count for the selected chat
+                        setChatlist((chatlist) =>
+                          chatlist.map((c) =>
+                            c._id === chat._id ? { ...c, unreadCount: 0 } : c
+                          )
+                        );
+
+                        // Select the user for chat
                         SelectedUserChat(
                           isSenderLoggedInUser
                             ? chat.receiver.username
                             : chat.sender.username
-                        )
-                      }
+                        );
+                      }}
                     >
                       <UserCard
                         username={
@@ -296,6 +320,7 @@ useEffect(() => {
                             : chat.sender.username
                         }
                         latestMessage={chat.text}
+                        unreadCount={chat.unreadCount}
                       />
                     </div>
                   );
