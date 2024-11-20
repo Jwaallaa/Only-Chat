@@ -14,6 +14,8 @@ const Register = ({ setregister, setlogin }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const port = "https://only-chat.onrender.com" //http://localhost:3000
+
   const togglePasswordVisibility = () => {
     setShow(!show); // Toggle the show state
   };
@@ -30,7 +32,7 @@ const Register = ({ setregister, setlogin }) => {
 
     try {
       const { data } = await axios.post(
-        "https://only-chat.onrender.com/api/user/register",
+        `${port}/api/user/register`,
         {
           name: name,
           username: username,

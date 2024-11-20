@@ -12,6 +12,8 @@ const Login = ({ setregister, setlogin }) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const port = "https://only-chat.onrender.com" //http://localhost:3000
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (email && password) {
@@ -25,7 +27,7 @@ const Login = ({ setregister, setlogin }) => {
 
       try {
         const { data } = await axios.post(
-          "https://only-chat.onrender.com/api/user/login",
+          `${port}/api/user/login`,
           { email, password },
           config
         );

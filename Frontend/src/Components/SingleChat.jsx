@@ -9,8 +9,7 @@ const SingleChat = ({
   setChathistory,
   setNewMessage,
   setShowSingleChat,
-  setSocketsent,
-  setSocketmessage
+  socketRef
 }) => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,16 +18,17 @@ const SingleChat = ({
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const chatEndRef = useRef(null);
 
+  const port = "https://only-chat.onrender.com" //http://localhost:3000
+
   const sendMessage = async (event) => {
     event.preventDefault();
     if (!message.trim()) return;
 
     setLoading(true);
-    setSocketsent(false);
     
     
 
-    const url = "https://only-chat.onrender.com/api/chats/message";
+    const url = `${port}/api/chats/message`;
     const token = userInfo.token;
 
     const messageData = {
@@ -59,8 +59,9 @@ const SingleChat = ({
         setMessage("");
         setLoading(false);
         setNewMessage(true);
-        setSocketmessage(data)
-        setSocketsent(true)
+        socketRef.current.emit("sendMessage", data);
+
+        
 
       } else {
         console.error("Error sending message:", data);
@@ -74,7 +75,7 @@ const SingleChat = ({
 
   const fetchFriendDetails = async () => {
     const token = userInfo.token;
-    const url = `https://only-chat.onrender.com/api/user/find/${friendName}`;
+    const url = `${port}/api/user/find/${friendName}`;
 
     try {
       const response = await fetch(url, {

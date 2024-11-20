@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Modal from "./Modal";
 
+
 const Navbar = ({
   setUsersearch,
   setSearch,
@@ -16,6 +17,8 @@ const Navbar = ({
   const [userDetails, setUserDetails] = useState(null);
   const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  const port = "https://only-chat.onrender.com" //http://localhost:3000
 
   // Debounced search effect
   useEffect(() => {
@@ -30,7 +33,7 @@ const Navbar = ({
     setIsSearching(true);
     try {
       const responce = await axios.get(
-        `https://only-chat.onrender.com/api/user/${searchbox}`,
+        `${port}/api/user/${searchbox}`,
         {
           method: "GET",
           headers: {

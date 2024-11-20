@@ -43,20 +43,35 @@ io.on("connection", (socket) => {
   //setup
   socket.on("setup", (userData) => {
     socket.join(userData._id);
-    console.log('connected successfully');
+    console.log('connected successfully' , userData._id);
   })
   
   // Join a room
-  socket.on("joinRoom", (chatId) => {
-    socket.join(chatId);
-    console.log(`User joined room: ${chatId}`);
-  });
+  // socket.on("joinRoom", (chatId) => {
+  //   socket.join(chatId);
+  //   console.log(`User joined room: ${chatId}`);
+  // });
 
   // Send a message
-  socket.on("sendMessage",(message) => {
+  socket.on("sendMessage",async (message) => {
     console.log("Message received:", message.text);
-    if (message) {
-    socket.to(message.receiver._id).emit("receiveMessage", message);}
+
+    const sendername = await User.findById(message.sender).select("username");
+    const receivername = await User.findById(message.receiver).select("username");
+
+    const updatedMessage = {
+      ...message,
+      sender: {
+          _id: message.sender,
+          username: sendername,
+      },
+      receiver: {
+          _id: message.receiver,
+          username: receivername,
+      },
+  };
+    console.log('sending' ,updatedMessage.text)
+    socket.to(message.receiver).emit("receiveMessage", updatedMessage);
   });
 
 
@@ -75,3 +90,8 @@ app.use("/api/chats", chatsRouter);
 // Start the server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+
+
+

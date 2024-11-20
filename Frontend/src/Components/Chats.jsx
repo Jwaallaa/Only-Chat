@@ -5,9 +5,13 @@ import UserCard from "./UserCard";
 import "./Chats.css";
 import SingleChat from "./SingleChat";
 import io from "socket.io-client";
+import { useRef } from "react";
+
+
+
+const port = "https://only-chat.onrender.com" //http://localhost:3000
 
 // Setup Socket.IO connection to the server
-const socket = io("https://only-chat.onrender.com");
 
 const Chats = () => {
   const [searchbox, setsearchbox] = useState("");
@@ -23,13 +27,24 @@ const Chats = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showSingleChat, setShowSingleChat] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const [socketmessage, setSocketmessage] = useState({});
-  const [socketsent, setSocketsent] = useState(true);
-
+  const [chatlist, setChatlist] = useState([])
+  
   //socket io setup
+  const socketRef = useRef(null);
+  
   useEffect(() => {
-    socket.emit("setup", userInfo);
-  });
+    if (!socketRef.current) {
+      socketRef.current = io(port);
+      socketRef.current.emit("setup", userInfo);
+    }
+  
+    // return () => {
+    //   socketRef.current?.disconnect();
+    //   socketRef.current = null;
+    // };
+  }, [userInfo]); 
+
+
 
   // Fetch chats
   const fetchChats = async () => {
@@ -38,7 +53,7 @@ const Chats = () => {
     const token = userInfo.token;
 
     try {
-      const response = await fetch("https://only-chat.onrender.com/api/chats", {
+      const response = await fetch(`${port}/api/chats`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -61,7 +76,7 @@ const Chats = () => {
 
     try {
       const response = await fetch(
-        `https://only-chat.onrender.com/api/chats/${username}`,
+        `${port}/api/chats/${username}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -77,7 +92,7 @@ const Chats = () => {
       setNewMessage(false);
       if (isMobile) setShowSingleChat(true); // Show single chat view on mobile
 
-      socket.emit("joinRoom", data[0].chatId);
+
     } catch (error) {
       console.error("Error fetching chats with selected user:", error);
       setChatLoading(false);
@@ -93,36 +108,66 @@ const Chats = () => {
   }, []);
 
   // Handle incoming messages via Socket.IO
-  useEffect(() => {
-    socket.on("receiveMessage", (message) => {
-      if (
-        !showSingleChat // if chat is not selected or doesn't match current chat
-      ) {
-        console.log(message.text);
-      } else {
-        setChathistory((Chathistory) => [...Chathistory, message]);
-      }
+// Handle incoming messages via Socket.IO
+useEffect(() => {
+  const handleMessage = (message) => {
+    const updatedChat = {
+      _id: message.chatId,
+      sender: message.sender._id,
+      receiver: message.receiver._id,
+      text: message.text,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+    };
 
-      return () => {
-        socket.off("receiveMessage");
-      };
-    });
-  });
+    setChathistory((prevChathistory) => [...prevChathistory, updatedChat]);
+
+    if (!showSingleChat) {
+      setChatlist((chatlist) =>
+        chatlist.map((chat) => {
+          if (
+            (chat.sender._id === message.sender._id && chat.receiver._id === message.receiver._id) ||
+            (chat.sender._id === message.receiver._id && chat.receiver._id === message.sender._id)
+          ) {
+            console.log(chat);
+            return {
+              ...chat,
+              text: message.text,
+              createdAt: message.createdAt,
+            };
+          }
+          return chat; // Always return the original chat if no match
+        })
+      );
+    }
+    };
+
+  socketRef.current?.on("receiveMessage", handleMessage);
+
+  return () => {
+    socketRef.current?.off("receiveMessage", handleMessage);
+  };
+}, [showSingleChat]);
+
+
+
+  // Include 'chats' so that the chat updates are reflected
+
 
   // Emit message to Socket.IO server
 
-  useEffect(() => {
-    if (socketsent) {
-      console.log("Emitting Message:", socketmessage);
-      socket.emit("sendMessage", socketmessage);
-    }
-  }, [socketsent]);
+  
 
   // Send the message to the receiver's socket
 
   useEffect(() => {
     fetchChats();
+    getUniqueChats();
   }, [newMessage]);
+  useEffect(() => {
+    getUniqueChats();
+  }, [chats]);
+  
 
   const handleLoginRedirect = () => {
     navigate("/Only-Chat");
@@ -145,29 +190,30 @@ const Chats = () => {
 
   const getUniqueChats = () => {
     const chatMap = new Map();
-
+  
     chats.forEach((chat) => {
       const userPairKey =
         chat.sender._id < chat.receiver._id
           ? `${chat.sender._id}-${chat.receiver._id}`
           : `${chat.receiver._id}-${chat.sender._id}`;
-
+  
       if (
         chatMap.has(userPairKey) &&
         new Date(chatMap.get(userPairKey).createdAt) > new Date(chat.createdAt)
       ) {
         return;
       }
-
+  
       chatMap.set(userPairKey, chat);
     });
-
+  
     const uniqueChats = Array.from(chatMap.values()).sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
-
-    return uniqueChats;
+    console.log(uniqueChats)
+    setChatlist(uniqueChats);
   };
+  
 
   return !userInfo || !userInfo.token ? (
     <div className="noLogin">
@@ -228,7 +274,7 @@ const Chats = () => {
               {loading ? (
                 <div className="spinner"></div>
               ) : chats.length > 0 ? (
-                getUniqueChats().map((chat) => {
+                chatlist.map((chat) => {
                   const isSenderLoggedInUser = chat.sender._id === userInfo._id;
                   return (
                     <div
@@ -266,8 +312,7 @@ const Chats = () => {
               loading={chatLoading}
               showSingleChat={showSingleChat}
               setShowSingleChat={setShowSingleChat}
-              setSocketmessage={setSocketmessage}
-              setSocketsent={setSocketsent}
+              socketRef={socketRef}
             />
           </>
         ) : // For Mobile, only show one at a time
@@ -277,11 +322,11 @@ const Chats = () => {
             {loading ? (
               <div className="spinner"></div>
             ) : chats.length > 0 ? (
-              getUniqueChats().map((chat) => {
+              chatlist.map((chat) => {
                 const isSenderLoggedInUser = chat.sender._id === userInfo._id;
                 return (
                   <div
-                    key={chat._id}
+                    key={chat.chatId}
                     onClick={() => {
                       SelectedUserChat(
                         isSenderLoggedInUser
@@ -315,8 +360,7 @@ const Chats = () => {
             loading={chatLoading}
             showSingleChat={showSingleChat}
             setShowSingleChat={setShowSingleChat}
-            setSocketmessage={setSocketmessage}
-            setSocketsent={setSocketsent}
+            socketRef={socketRef}
           />
         )}
       </div>
