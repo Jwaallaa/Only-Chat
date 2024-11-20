@@ -109,21 +109,22 @@ const Chats = () => {
         createdAt: message.createdAt,
         updatedAt: message.updatedAt,
       };
-
-      setChathistory((prevChathistory) => [...prevChathistory, updatedChat]);
+      if(showSingleChat){
+        console.log( 'received chat ' , updatedChat);
+        
+        setChathistory((prevChathistory) => [...prevChathistory, updatedChat]);
+      }
 
       if (!showSingleChat) {
-        if(message.sender._id){
         setChatlist((chatlist) => {
           let updatedChat;
-          var isMatch;
+          var isMatch = false;
           const updatedChatlist = chatlist.filter((chat) => {
             isMatch =
-              (chat.sender._id === message.sender._id &&
-                chat.receiver._id === message.receiver._id) ||
-              (chat.sender._id === message.receiver._id &&
-                chat.receiver._id === message.sender._id);
-
+        (chat.sender._id === message.sender._id && chat.receiver._id === message.receiver._id) ||
+        (chat.sender._id === message.receiver._id && chat.receiver._id === message.sender._id);
+            
+            
             if (isMatch) {
               updatedChat = {
                 ...chat,
@@ -137,23 +138,22 @@ const Chats = () => {
           });
           console.log(updatedChat);
           // Prepend the updated chat at the top if found
-          if(isMatch){
-          return updatedChat
-            ? [updatedChat, ...updatedChatlist]
-            : updatedChatlist;
-          }
-          if(!isMatch){
-            updatedChat = {
-              ...message,
-              unreadCount: 1,
-            }
-            console.log(updatedChat)
-            setChats((chats)=>[updatedChat,...chats])
-            return [updatedChat, ...updatedChatlist];
-
-          }
+          // if (isMatch) {
+          // console.log(isMatch)
+            return updatedChat
+              ? [updatedChat, ...updatedChatlist]
+              : updatedChatlist;
+          // }
+          // else if (!isMatch) {
+          //   updatedChat = {
+          //     ...message,
+          //     unreadCount: 1,
+          //   };
+          //   // setChats((chats) => [updatedChat, ...chats]);
+          //   return [updatedChat, ...updatedChatlist];
+          // }
         });
-      }}
+      }
     };
 
     socketRef.current?.on("receiveMessage", handleMessage);
@@ -199,15 +199,17 @@ const Chats = () => {
   const getUniqueChats = () => {
     const chatMap = new Map();
 
-    
     chats.forEach((chat) => {
-
-      if (!chat || !chat.sender || !chat.receiver || !chat.sender._id || !chat.receiver._id) {
+      if (
+        !chat ||
+        !chat.sender ||
+        !chat.receiver ||
+        !chat.sender._id ||
+        !chat.receiver._id
+      ) {
         console.warn("Skipping invalid chat entry:", chat);
         return; // Skip this iteration
       }
-
-
       const userPairKey =
         chat.sender._id < chat.receiver._id
           ? `${chat.sender._id}-${chat.receiver._id}`
@@ -355,6 +357,14 @@ const Chats = () => {
                   <div
                     key={chat.chatId}
                     onClick={() => {
+                      // Reset unread count for the selected chat
+                      setChatlist((chatlist) =>
+                        chatlist.map((c) =>
+                          c._id === chat._id ? { ...c, unreadCount: 0 } : c
+                        )
+                      );
+
+                      // Select the user for chat
                       SelectedUserChat(
                         isSenderLoggedInUser
                           ? chat.receiver.username
@@ -369,6 +379,7 @@ const Chats = () => {
                           : chat.sender.username
                       }
                       latestMessage={chat.text}
+                      unreadCount={chat.unreadCount}
                     />
                   </div>
                 );
