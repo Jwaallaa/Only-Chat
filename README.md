@@ -54,7 +54,7 @@ Install dependencies:
    npm install
    ```
 
-2. Configure environment variables:
+2. Configure environment variables:  
 ***Create a .env file in the backend directory with the following content:***
    ```bash
    env
@@ -62,31 +62,38 @@ Install dependencies:
    PORT=5000  
    MONGO_URI=<your_mongo_connection_string>  
    JWT_SECRET=<your_jwt_secret>  
-   SOCKET_IO_SERVER=<your_socket_io_server_url> ```
+   SOCKET_IO_SERVER=<your_socket_io_server_url>
+   ```
 Start the server:
    ```bash
-   npm start  ```
+   npm start
+   ```
 
-###Frontend Setup
+###Frontend Setup  
 ***Navigate to the frontend directory:***
    ```bash
-   cd ../frontend ```
+   cd ../frontend
+   ```
 ***Install dependencies:***
    ```bash
-   npm install  ```
+   npm install
+   ```
 
 Update API endpoint:
 Update the backend API URL in the frontend/src/config.js file:
    ```bash
-   export const API_URL = "https://your-backend-url.onrender.com";  
+   export const API_URL = "https://your-backend-url.onrender.com";
+   ```
 Start the development server:
    ```bash
-   npm start  
+   npm start
+   ```
 ##Deployment
 Frontend
 Build the app:
    ```bash
-   npm run build  
+   npm run build
+   ``` 
  
 ##Backend Setup
 Deploy the backend on Render or any other cloud platform. Ensure the deployed URL is updated in the frontend configuration.
@@ -100,15 +107,20 @@ Users Collection
   |password	| String	|Encrypted user password|
   |username |	String|	Unique username|
   |createdAt |	Date	|Timestamp of creation|
-  |updatedAt |	Date	|Timestamp of last update|```
+  |updatedAt |	Date	|Timestamp of last update|
+   ```
 Chats Collection
    ```bash
-   _id	ObjectId	Unique identifier
-   sender	ObjectId	User who sent the message
-   receiver	ObjectId	User who received the message
-   text	String	Message text
-   createdAt	Date	Timestamp of creation
-   updatedAt	Date	Timestamp of last update
+   | Field       | Type      | Description                  |
+|-------------|-----------|------------------------------|
+| `_id`       | ObjectId  | Unique identifier            |
+| `sender`    | ObjectId  | User who sent the message    |
+| `receiver`  | ObjectId  | User who received the message|
+| `text`      | String    | Message text                 |
+| `createdAt` | Date      | Timestamp of creation        |
+| `updatedAt` | Date      | Timestamp of last update     |
+   ```
+
 
 ###Future Improvements
 - Group chat functionality
