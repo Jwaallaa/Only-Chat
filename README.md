@@ -99,18 +99,19 @@ Build the app:
 Deploy the backend on Render or any other cloud platform. Ensure the deployed URL is updated in the frontend configuration.
 ###Database Schema
 Users Collection
-   ```bash
-  | _id|	ObjectId|	Unique identifier|
-  |----| --------| -------------------|
-  |name |	String	|Full name of the user|
-  |email |	String	|User's email address|
-  |password	| String	|Encrypted user password|
-  |username |	String|	Unique username|
-  |createdAt |	Date	|Timestamp of creation|
-  |updatedAt |	Date	|Timestamp of last update|
-   ```
+   
+| Field       | Type      | Description              |
+|-------------|-----------|--------------------------|
+| `_id`       | ObjectId  | Unique identifier        |
+| `name`      | String    | Full name of the user    |
+| `email`     | String    | User's email address     |
+| `password`  | String    | Encrypted user password  |
+| `username`  | String    | Unique username          |
+| `createdAt` | Date      | Timestamp of creation    |
+| `updatedAt` | Date      | Timestamp of last update |
+
+   
 Chats Collection
-   ```bash
    | Field       | Type      | Description                  |
 |-------------|-----------|------------------------------|
 | `_id`       | ObjectId  | Unique identifier            |
@@ -119,7 +120,7 @@ Chats Collection
 | `text`      | String    | Message text                 |
 | `createdAt` | Date      | Timestamp of creation        |
 | `updatedAt` | Date      | Timestamp of last update     |
-   ```
+   
 
 
 ###Future Improvements
