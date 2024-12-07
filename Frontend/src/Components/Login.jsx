@@ -56,7 +56,7 @@ const Login = ({ setregister, setlogin }) => {
 
   return (
     <div className="login-box">
-      <h2>Welcome Back</h2>
+      <h2><b>Welcome Back</b></h2>
       <Form onSubmit={handleLogin}>
         <input
           type="text"

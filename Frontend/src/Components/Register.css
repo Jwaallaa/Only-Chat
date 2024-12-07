@@ -7,8 +7,8 @@
     justify-content: center;
     align-items: center;
     background-color: #ffe6f5; /* Subtle background color */
-    padding: 20px;
-    margin: 20px auto;
+    padding: 15px;
+    margin: 15px auto;
     border-radius: 20px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Adding some shadow for depth */
     transition: all 0.3s ease-in-out;

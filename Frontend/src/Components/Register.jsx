@@ -61,7 +61,7 @@ const Register = ({ setregister, setlogin }) => {
   return (
     <>
       <div className="register-box">
-        <h2>Get Started</h2>
+        <h2><b>Get Started</b></h2>
         <Form onSubmit={handleSubmit}>
           <input
             type="text"

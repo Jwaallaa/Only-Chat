@@ -1,18 +1,20 @@
 /* General navbar styling */
 nav {
-  width: 100vw;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   height: 40px;
   align-items: center;
   margin: 5px 0;
   padding: 5px 0;
+  overflow: hidden;
 }
 
 /* Search container styling */
 nav .search-container {
   position: relative;
   width: 20%;
+  left: 1vw;
 }
 
 /* Search input styling */
@@ -109,6 +111,7 @@ nav input {
     width: 70px;
     height: 30px;
     font-size: 12px;
+    right: 6px;
   }
 
   .profile {
