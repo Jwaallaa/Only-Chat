@@ -123,22 +123,19 @@ Chats Collection
    
 
 
-###Future Improvements
+### Future Improvements
 - Group chat functionality
 - Enhanced user profile features
 - Push notifications for new messages
 - Advanced search with filters
-##License
+### License
 This project is licensed under the MIT License. See the LICENSE file for details.
 
-##Contributing
+### Contributing
 Contributions are welcome! Feel free to fork this repository, open issues, or submit pull requests.
 
-##Contact
+### Contact  
 Udit Jaiswal
 
 - [LinkedIn](https://www.linkedin.com/in/udit--jaiswal/)
 - [GitHub](https://github.com/Jwaallaa/)
-
-
-Copy this into your `README.md` file, and it should render perfectly on GitHub or other Mark
