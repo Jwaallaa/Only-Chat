@@ -47,10 +47,12 @@
 1. Clone the repository:  
    ```bash  
    git clone https://github.com/Jwaallaa/Only-Chat.git  
-   cd Only-Chat/backend  ```
+   cd Only-Chat/backend
+   ```
 Install dependencies:
    ```bash
-   npm install ```
+   npm install
+   ```
 
 2. Configure environment variables:
 ***Create a .env file in the backend directory with the following content:***
