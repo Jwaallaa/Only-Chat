@@ -47,29 +47,32 @@
 1. Clone the repository:  
    ```bash  
    git clone https://github.com/Jwaallaa/Only-Chat.git  
-   cd Only-Chat/backend  
+   cd Only-Chat/backend  ```
 Install dependencies:
    ```bash
-   npm install  
-Configure environment variables:
-Create a .env file in the backend directory with the following content:
+   npm install ```
+
+2. Configure environment variables:
+***Create a .env file in the backend directory with the following content:***
    ```bash
    env
    Copy code
    PORT=5000  
    MONGO_URI=<your_mongo_connection_string>  
    JWT_SECRET=<your_jwt_secret>  
-   SOCKET_IO_SERVER=<your_socket_io_server_url>  
+   SOCKET_IO_SERVER=<your_socket_io_server_url> ```
 Start the server:
    ```bash
-   npm start  
-##Frontend Setup
-Navigate to the frontend directory:
+   npm start  ```
+
+###Frontend Setup
+***Navigate to the frontend directory:***
    ```bash
-   cd ../frontend  
-Install dependencies:
+   cd ../frontend ```
+***Install dependencies:***
    ```bash
-   npm install  
+   npm install  ```
+
 Update API endpoint:
 Update the backend API URL in the frontend/src/config.js file:
    ```bash
@@ -88,13 +91,14 @@ Deploy the backend on Render or any other cloud platform. Ensure the deployed UR
 ###Database Schema
 Users Collection
    ```bash
-   _id	ObjectId	Unique identifier
-   name	String	Full name of the user
-   email	String	User's email address
-   password	String	Encrypted user password
-   username	String	Unique username
-   createdAt	Date	Timestamp of creation
-   updatedAt	Date	Timestamp of last update
+  | _id|	ObjectId|	Unique identifier|
+  |----| --------| -------------------|
+  |name |	String	|Full name of the user|
+  |email |	String	|User's email address|
+  |password	| String	|Encrypted user password|
+  |username |	String|	Unique username|
+  |createdAt |	Date	|Timestamp of creation|
+  |updatedAt |	Date	|Timestamp of last update|```
 Chats Collection
    ```bash
    _id	ObjectId	Unique identifier
@@ -105,10 +109,10 @@ Chats Collection
    updatedAt	Date	Timestamp of last update
 
 ###Future Improvements
-Group chat functionality
-Enhanced user profile features
-Push notifications for new messages
-Advanced search with filters
+- Group chat functionality
+- Enhanced user profile features
+- Push notifications for new messages
+- Advanced search with filters
 ##License
 This project is licensed under the MIT License. See the LICENSE file for details.
 
@@ -118,8 +122,8 @@ Contributions are welcome! Feel free to fork this repository, open issues, or su
 ##Contact
 Udit Jaiswal
 
-LinkedIn
-GitHub
+- [LinkedIn](https://www.linkedin.com/in/udit--jaiswal/)
+- [GitHub](https://github.com/Jwaallaa/)
 
 
 Copy this into your `README.md` file, and it should render perfectly on GitHub or other Mark
