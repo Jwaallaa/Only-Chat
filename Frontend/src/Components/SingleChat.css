@@ -12,7 +12,8 @@
 }
 @media (max-width: 768px) {
   .singlechat {
-    width: 100%;
+    width: 96%;
+    margin: 0 auto;
     
   }}
 
@@ -34,7 +35,7 @@ i:hover {
 }
 
 .chatcontainer {
-  background-color: rgba(62, 62, 62, 0.153);
+  background-color: rgba(88, 88, 88, 0.153);
   width: 90%;
   height: 82%;
   display: flex;

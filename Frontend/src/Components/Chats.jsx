@@ -100,23 +100,33 @@ const Chats = () => {
   // Handle incoming messages via Socket.IO
   // Handle incoming messages via Socket.IO
   useEffect(() => {
-    const handleMessage = (message) => {
-      const updatedChat = {
-        _id: message.chatId,
-        sender: message.sender._id,
-        receiver: message.receiver._id,
-        text: message.text,
-        createdAt: message.createdAt,
-        updatedAt: message.updatedAt,
+    console.log(chatlist)
+    const handleMessage = async (message) => {
+      console.log(message)
+      
+      const updatedChatfirst = {
+        ...message,
+        sender :{
+          _id : message.sender._id,
+          username : message.sender.username.username,
+        },
+        receiver:{
+          _id : message.receiver._id,
+          username : message.receiver.username.username,
+        }
       };
+      
       if(showSingleChat){
-        console.log( 'received chat ' , updatedChat);
+        console.log( 'received chat ' , updatedChatfirst);
         
-        setChathistory((prevChathistory) => [...prevChathistory, updatedChat]);
+        setChathistory((prevChathistory) => [...prevChathistory, updatedChatfirst]);
       }
 
       if (!showSingleChat) {
+        
         setChatlist((chatlist) => {
+         
+            
           let updatedChat;
           var isMatch = false;
           const updatedChatlist = chatlist.filter((chat) => {
@@ -138,21 +148,20 @@ const Chats = () => {
           });
           console.log(updatedChat);
           // Prepend the updated chat at the top if found
-          // if (isMatch) {
-          // console.log(isMatch)
+          let newupdatedChat = {
+            ...updatedChatfirst,
+            
+            unreadCount: 1,
+          };
+          console.log(newupdatedChat);
             return updatedChat
               ? [updatedChat, ...updatedChatlist]
-              : updatedChatlist;
-          // }
-          // else if (!isMatch) {
-          //   updatedChat = {
-          //     ...message,
-          //     unreadCount: 1,
-          //   };
-          //   // setChats((chats) => [updatedChat, ...chats]);
-          //   return [updatedChat, ...updatedChatlist];
-          // }
+              : [newupdatedChat, ...updatedChatlist]
+          
         });
+        console.log(chatlist.length + "length of chats")
+        
+        console.log(chatlist + "this is after")
       }
     };
 
@@ -161,7 +170,7 @@ const Chats = () => {
     return () => {
       socketRef.current?.off("receiveMessage", handleMessage);
     };
-  }, [showSingleChat]);
+  }, [showSingleChat,chatlist]);
 
   // Include 'chats' so that the chat updates are reflected
 
@@ -294,7 +303,7 @@ const Chats = () => {
               {loading ? (
                 <div className="spinner"></div>
               ) : chats.length > 0 ? (
-                chatlist.map((chat) => {
+                chatlist.map((chat,index) => {
                   const isSenderLoggedInUser = chat.sender._id === userInfo._id;
                   return (
                     <div
