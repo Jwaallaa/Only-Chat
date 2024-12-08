@@ -42,7 +42,6 @@ const Navbar = ({
         }
       );
       setLoading(true);
-      console.log(responce.data);
       setUsersearch(responce.data);
     } catch (error) {
       console.error("Search error:", error);

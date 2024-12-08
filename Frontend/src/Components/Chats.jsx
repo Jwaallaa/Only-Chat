@@ -100,9 +100,7 @@ const Chats = () => {
   // Handle incoming messages via Socket.IO
   // Handle incoming messages via Socket.IO
   useEffect(() => {
-    console.log(chatlist)
     const handleMessage = async (message) => {
-      console.log(message)
       
       const updatedChatfirst = {
         ...message,
@@ -117,7 +115,6 @@ const Chats = () => {
       };
       
       if(showSingleChat){
-        console.log( 'received chat ' , updatedChatfirst);
         
         setChathistory((prevChathistory) => [...prevChathistory, updatedChatfirst]);
       }
@@ -146,22 +143,18 @@ const Chats = () => {
             }
             return true; // Keep the other chats
           });
-          console.log(updatedChat);
           // Prepend the updated chat at the top if found
           let newupdatedChat = {
             ...updatedChatfirst,
             
             unreadCount: 1,
           };
-          console.log(newupdatedChat);
             return updatedChat
               ? [updatedChat, ...updatedChatlist]
               : [newupdatedChat, ...updatedChatlist]
           
         });
-        console.log(chatlist.length + "length of chats")
         
-        console.log(chatlist + "this is after")
       }
     };
 
@@ -299,7 +292,10 @@ const Chats = () => {
         {!isMobile ? (
           <>
             <div className="chatscontainer">
+              <div className="top">
               <h2>Chats</h2>
+              <i class="fa-solid fa-user-group"></i>
+              </div>
               {loading ? (
                 <div className="spinner"></div>
               ) : chats.length > 0 ? (
@@ -356,7 +352,10 @@ const Chats = () => {
         ) : // For Mobile, only show one at a time
         !showSingleChat ? (
           <div className="chatscontainer">
-            <h2>Chats</h2>
+            <div className="top">
+              <h2>Chats</h2>
+              <i class="fa-solid fa-user-group"></i>
+              </div>
             {loading ? (
               <div className="spinner"></div>
             ) : chats.length > 0 ? (

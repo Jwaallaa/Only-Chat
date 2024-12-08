@@ -38,7 +38,9 @@
         margin-bottom: 25px;
       }
     > i {
-      /* margin-right: 3px; */
+      display: flex;
+      justify-content: center;
+      align-items: center;
       font-size: 25px;
       height: 15px;
       width: 15px;
@@ -67,6 +69,7 @@
   }
 }
 
+
 .chatscontainer {
   min-width: 318px;
   background-color: #8d8d8d88;
@@ -74,11 +77,37 @@
   border-bottom-right-radius: 12px;
   padding: 8px 12px;
 
-  > h2 {
-    background-color: bisque;
-    padding: 6px 10px;
-    border-radius: 12px;
-    margin-bottom: 10px;
+
+  .top{
+    display: flex;
+    width: 98%;
+    justify-content: space-evenly;
+    > h2 {
+      background-color: bisque;
+      height: 40px;
+      max-width: 80%;
+      min-width: 75%;
+      padding: 6px 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    i{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 12px;
+      width: 9%;
+      height: 30px;
+      color: whitesmoke;
+      background-color: rgb(106, 62, 21);
+      transition: all 0.15s ease-in-out ;
+    }
+      i:hover{
+      
+        transform:scale(1.05);
+        background-color: #ff3a3e;
+    }
+    
   }
 }
 .spinner {
@@ -129,6 +158,7 @@
   .chatpage {
     flex-direction: column;
     padding: 10px 0;
+    width: 100vw;
     
   }
 
@@ -141,11 +171,35 @@
     height: 100%;
     padding: 10px 0;
     margin-bottom: 20px;
-    h2{
-      width: 90%;
+  }
+  .chatscontainer > .top{
+    display: flex;
+    justify-content: space-evenly;
+    > h2 {
+      /* background-color: bisque; */
+      min-width: 70vw;
+      padding: 6px 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
     }
-   
-    
+    i{
+      border-radius: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 10vw;
+      height: 30px;
+      color: whitesmoke;
+      background-color: rgb(106, 62, 21);
+      transition: all 0.8s ease-in ;
+    :hover{
+      
+        transform:scale(1.05);
+        background-color: #ff3a3e;
+    }
+      
+    }
   }
   .singlechat {
     width: 100%;

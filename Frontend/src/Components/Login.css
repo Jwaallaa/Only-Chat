@@ -71,6 +71,11 @@
     background-color: #4f2b10;
     transform: scale(1.05); /* Slight grow effect */
   }
+
+  .login-box > form > button:hover {
+    background-color: #ff3a3e; /* Button hover effect */
+    transform: scale(1.05);
+}
   
   /* Password container to hold input and icon together */
   .password-container {
